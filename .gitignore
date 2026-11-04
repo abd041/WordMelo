@@ -38,6 +38,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local vocab build scratch (must not ship — confuses Vercel monorepo detection)
+/tmp-vocab/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
