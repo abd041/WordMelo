@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/react";
 import { DM_Sans, Fraunces, Source_Serif_4 } from "next/font/google";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -88,6 +89,7 @@ export default function RootLayout({
       >
         <JsonLd data={[websiteJsonLd, organizationJsonLd]} />
         <SiteShell>{children}</SiteShell>
+        <Analytics />
       </body>
     </html>
   );

@@ -20,7 +20,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="mt-3 text-sm text-ink-muted">
-          Last updated: November 5, 2026
+          Last updated: November 5, 2026 (Vercel Web Analytics)
         </p>
         <div className="prose-wordmelo mt-6">
           <p>
@@ -69,18 +69,35 @@ export default function PrivacyPage() {
             does not include an authentication system or a product database for
             user accounts.
           </p>
+
+          <h2>Vercel Web Analytics</h2>
           <p>
-            If analytics, advertising, or other third-party scripts are added
+            WordMelo uses{" "}
+            <a
+              href="https://vercel.com/docs/analytics"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Vercel Web Analytics
+            </a>{" "}
+            to understand which pages are visited and how traffic arrives. This
+            measures aggregated page views and referrers. It does{" "}
+            <strong>not</strong> receive the text you type into WordMelo tools —
+            tool content still stays in your browser for local processing.
+          </p>
+          <p>
+            If advertising scripts or additional analytics products are added
             later, this policy will be updated before those services begin
-            collecting data beyond ordinary server logs.
+            collecting more data.
           </p>
 
           <h2>Cookies</h2>
           <p>
-            WordMelo does not currently set product cookies for accounts or
-            personalization. Your browser may still create temporary technical
-            storage as part of normal browsing. Future features will document any
-            cookies they require.
+            WordMelo does not set product cookies for accounts or personalization.
+            Your browser may still create temporary technical storage as part of
+            normal browsing. Vercel’s analytics documentation describes how their
+            product handles visitors; we do not use analytics to identify you by
+            name or email.
           </p>
 
           <h2>Fonts and static assets</h2>
