@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { DM_Sans, Fraunces, Source_Serif_4 } from "next/font/google";
+import Script from "next/script";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getContactEmail, siteConfig } from "@/lib/site";
@@ -89,6 +90,17 @@ export default function RootLayout({
       >
         <JsonLd data={[websiteJsonLd, organizationJsonLd]} />
         <SiteShell>{children}</SiteShell>
+        <Script
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-MR6GRV4J"
+          strategy="afterInteractive"
+        />
+        <Script id="google-tag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+          `}
+        </Script>
         <Analytics />
       </body>
     </html>

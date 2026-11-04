@@ -85,10 +85,20 @@ export default function PrivacyPage() {
             <strong>not</strong> receive the text you type into WordMelo tools —
             tool content still stays in your browser for local processing.
           </p>
+
+          <h2>Google Tag Manager</h2>
           <p>
-            If advertising scripts or additional analytics products are added
-            later, this policy will be updated before those services begin
-            collecting more data.
+            WordMelo also loads Google Tag Manager (container{" "}
+            <code>GTM-MR6GRV4J</code>) so measurement and advertising tags
+            configured in that container can run site-wide. Tags managed through
+            GTM may collect standard usage and device/browser signals according
+            to Google’s and each tag vendor’s policies. Tool editor contents are
+            still processed locally in your browser and are not uploaded to
+            WordMelo for analysis.
+          </p>
+          <p>
+            If additional advertising or analytics products are added outside
+            this setup, this policy will be updated again.
           </p>
 
           <h2>Cookies</h2>
