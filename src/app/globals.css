@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Warm editorial paper with refined teal accents */
+  --paper: #f4f6f4;
+  --ink: #122033;
+  --ink-muted: #445261;
+  --ink-soft: #546274;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #e8eee9;
+  --line: #d5ddd6;
+  --line-strong: #b7c4ba;
+  --accent: #0e6b66;
+  --accent-hover: #0a5652;
+  --accent-soft: #d8efec;
+  --accent-foreground: #ffffff;
+  --mint: #eef7f5;
+  --success: #1f7a4d;
+  --warning: #9a6700;
+  --danger: #b42318;
+  --glow-a: rgba(15, 111, 106, 0.12);
+  --glow-b: rgba(45, 90, 135, 0.1);
+  --shadow-soft: 0 1px 2px rgba(18, 32, 51, 0.04),
+    0 8px 24px rgba(18, 32, 51, 0.06);
+  --shadow-lift: 0 2px 4px rgba(18, 32, 51, 0.05),
+    0 18px 44px rgba(18, 32, 51, 0.09);
+  --shadow-glow: 0 0 0 1px rgba(14, 107, 102, 0.12),
+    0 18px 48px rgba(14, 107, 102, 0.12);
+  --focus-ring: 0 0 0 3px rgba(15, 111, 106, 0.35);
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+
+  textarea:focus-visible,
+  input:focus-visible {
+    outline-offset: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-ink tracking-tight;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8;
+  }
+
+  .surface-card {
+    @apply rounded-card border border-line bg-surface shadow-soft;
+  }
+
+  .interactive-lift {
+    @apply transition-[transform,box-shadow,border-color] duration-200 ease-out;
+  }
+
+  .interactive-lift:hover {
+    @apply -translate-y-0.5 shadow-lift;
+  }
+
+  .prose-wordmelo {
+    @apply max-w-prose text-[1.05rem] leading-8 text-ink-muted;
+  }
+
+  .prose-wordmelo h2 {
+    @apply mb-3 mt-10 font-display text-2xl font-semibold text-ink first:mt-0;
+  }
+
+  .prose-wordmelo h3 {
+    @apply mb-2 mt-8 font-sans text-lg font-semibold text-ink;
+  }
+
+  .prose-wordmelo p {
+    @apply mb-4;
+  }
+
+  .prose-wordmelo ul {
+    @apply mb-4 list-disc space-y-2 pl-5;
+  }
+
+  .prose-wordmelo ol {
+    @apply mb-4 list-decimal space-y-2 pl-5;
+  }
+
+  .prose-wordmelo strong {
+    @apply font-semibold text-ink;
+  }
+
+  .prose-wordmelo a {
+    @apply font-medium text-accent underline-offset-2 hover:underline;
+  }
+
+  .ad-region {
+    /* Reserved non-intrusive zone for future ads — empty and unlabeled */
+    @apply my-8 min-h-0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .interactive-lift:hover {
+    transform: none;
+  }
+}

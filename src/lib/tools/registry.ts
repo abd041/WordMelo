@@ -1,0 +1,338 @@
+import {
+  isPublishedTool,
+  type PublishedTool,
+  type ToolCategory,
+  type ToolDefinition,
+} from "./types";
+
+export const toolCategories: ToolCategory[] = [
+  {
+    id: "counting",
+    name: "Counting & analysis",
+    description: "Measure words, characters, timing, and frequency.",
+  },
+  {
+    id: "conversion",
+    name: "Case & conversion",
+    description: "Change letter case and transform text formats.",
+  },
+  {
+    id: "formatting",
+    name: "Styling & formatting",
+    description: "Generate decorative or styled text variants.",
+  },
+  {
+    id: "generation",
+    name: "Generators",
+    description:
+      "Create sample words, writing prompts, and placeholder text.",
+  },
+];
+
+/**
+ * Canonical tool catalog.
+ * Only tools with status "published" may appear as available products
+ * or be included in the sitemap.
+ */
+export const tools: ToolDefinition[] = [
+  {
+    id: "word-counter",
+    name: "Word Counter",
+    slug: "word-counter",
+    status: "published",
+    categoryId: "counting",
+    summary:
+      "Count words, characters, sentences, and reading time privately in your browser.",
+    description:
+      "Paste or type text to get live word, character, sentence, and paragraph counts plus reading and speaking time estimates.",
+    keywords: [
+      "word counter",
+      "character count",
+      "word count tool",
+      "reading time",
+      "online word counter",
+    ],
+    href: "/word-counter",
+    icon: "counter",
+  },
+  {
+    id: "character-counter",
+    name: "Character Counter",
+    slug: "character-counter",
+    status: "published",
+    categoryId: "counting",
+    summary:
+      "Count characters, letters, spaces, and Unicode length with a custom limit checker.",
+    description:
+      "Count characters with and without spaces, letters, words, graphemes, code points, and UTF-8 bytes — plus a custom character-limit checker. Everything runs locally in your browser.",
+    keywords: [
+      "character counter",
+      "character count",
+      "letter counter",
+      "letter count",
+      "count characters online",
+      "online character counter",
+      "free character counter",
+      "character counter with spaces",
+      "character counter without spaces",
+      "character limit checker",
+      "unicode character counter",
+    ],
+    href: "/character-counter",
+    icon: "characters",
+  },
+  {
+    id: "case-converter",
+    name: "Case Converter",
+    slug: "case-converter",
+    status: "published",
+    categoryId: "conversion",
+    summary:
+      "Convert text to uppercase, lowercase, sentence case, title case, camelCase, and more.",
+    description:
+      "Change letter casing instantly with uppercase, lowercase, sentence case, title case, alternating case, camelCase, snake_case, kebab-case, and more — processed locally in your browser.",
+    keywords: [
+      "case converter",
+      "uppercase converter",
+      "lowercase converter",
+      "convert case",
+      "text case converter",
+      "sentence case converter",
+      "title case converter",
+      "camel case converter",
+      "snake case converter",
+      "kebab case converter",
+      "free case converter",
+    ],
+    href: "/case-converter",
+    icon: "case",
+  },
+  {
+    id: "title-case-converter",
+    name: "Title Case Converter",
+    slug: "title-case-converter",
+    status: "published",
+    categoryId: "conversion",
+    summary:
+      "Capitalize titles and headlines with APA, MLA, Chicago, and AP composition rules.",
+    description:
+      "Convert titles using sourced APA 7, MLA 9, Chicago 18, and AP composition-title policies. Compare styles, highlight changes, preserve brands, and batch-convert lines locally in your browser.",
+    keywords: [
+      "title case converter",
+      "titlecase converter",
+      "title capitalization tool",
+      "title case generator",
+      "convert to title case",
+      "headline capitalization",
+      "capitalize titles",
+      "online title case converter",
+      "APA title case converter",
+      "MLA title case converter",
+      "Chicago title case converter",
+      "AP title capitalization",
+    ],
+    href: "/title-case-converter",
+    icon: "title",
+  },
+  {
+    id: "fancy-text-generator",
+    name: "Fancy Text Generator",
+    slug: "fancy-text-generator",
+    status: "published",
+    categoryId: "formatting",
+    summary:
+      "Generate stylish Unicode fonts to copy and paste for bios, names, and captions.",
+    description:
+      "Transform plain text into bold, script, gothic, circled, and decorative Unicode styles for Instagram, TikTok, Discord, and more — processed locally in your browser.",
+    keywords: [
+      "fancy text generator",
+      "fancy font generator",
+      "fancy text copy and paste",
+      "stylish text generator",
+      "fancy fonts copy and paste",
+      "cool text generator",
+      "unicode text generator",
+      "aesthetic text generator",
+      "instagram font generator",
+      "discord font generator",
+      "tiktok font generator",
+      "fancy name generator",
+    ],
+    href: "/fancy-text-generator",
+    icon: "fancy",
+  },
+  {
+    id: "cursive-generator",
+    name: "Cursive Generator",
+    slug: "cursive-generator",
+    status: "published",
+    categoryId: "formatting",
+    summary:
+      "Create copyable Unicode cursive fonts or design handwriting and download a PNG.",
+    description:
+      "Generate mathematical script cursive text to copy and paste, personalize names, and preview real OFL handwriting fonts with PNG export — processed locally in your browser.",
+    keywords: [
+      "cursive generator",
+      "cursive font generator",
+      "cursive text generator",
+      "cursive maker",
+      "cursive script generator",
+      "cursive writing generator",
+      "cursive name generator",
+      "cursive fonts copy and paste",
+      "fancy cursive font generator",
+      "cursive handwriting generator",
+      "pretty cursive text",
+      "names in cursive",
+    ],
+    href: "/cursive-generator",
+    icon: "cursive",
+  },
+  {
+    id: "random-word-generator",
+    name: "Random Word Generator",
+    slug: "random-word-generator",
+    status: "published",
+    categoryId: "generation",
+    summary:
+      "Generate random English words with length, letter, and part-of-speech filters.",
+    description:
+      "Create unique random English words for writing prompts, vocabulary practice, and informal games — filter by nouns, verbs, adjectives, length, difficulty, and letters, all processed locally in your browser.",
+    keywords: [
+      "random word generator",
+      "random words",
+      "random word picker",
+      "generate random words",
+      "random word generator online",
+      "random word generator free",
+      "random english word generator",
+      "random noun generator",
+      "random verb generator",
+      "random adjective generator",
+      "random 5 letter word generator",
+      "creative writing word generator",
+    ],
+    href: "/random-word-generator",
+    icon: "random",
+  },
+  {
+    id: "pictionary-word-generator",
+    name: "Pictionary Word Generator",
+    slug: "pictionary-word-generator",
+    status: "published",
+    categoryId: "generation",
+    summary:
+      "Curated drawing prompts with timer, categories, and local team scoring.",
+    description:
+      "Generate family-friendly Pictionary drawing prompts or play a timed team game with secret prompts and scores — all processed locally in your browser.",
+    keywords: [
+      "pictionary word generator",
+      "random pictionary word generator",
+      "pictionary words",
+      "pictionary word list",
+      "pictionary drawing prompts",
+      "easy pictionary words",
+      "hard pictionary words",
+      "pictionary game word generator",
+    ],
+    href: "/pictionary-word-generator",
+    icon: "pictionary",
+  },
+  {
+    id: "random-letter-generator",
+    name: "Random Letter Generator",
+    slug: "random-letter-generator",
+    status: "published",
+    categoryId: "generation",
+    summary:
+      "Pick random letters A–Z, vowels or consonants, with unique batches and an alphabet wheel.",
+    description:
+      "Generate random English letters instantly — choose vowels or consonants, exclude letters, avoid repeats, shuffle A–Z, or spin an accessible alphabet wheel. Everything runs locally in your browser.",
+    keywords: [
+      "random letter generator",
+      "random letter picker",
+      "random alphabet generator",
+      "generate random letters",
+      "random letters A to Z",
+      "free random letter generator",
+      "online random letter generator",
+      "random vowel generator",
+      "random consonant generator",
+      "random letter generator wheel",
+    ],
+    href: "/random-letter-generator",
+    icon: "letter",
+  },
+  {
+    id: "lorem-ipsum-generator",
+    name: "Lorem Ipsum Generator",
+    slug: "lorem-ipsum-generator",
+    status: "published",
+    categoryId: "generation",
+    summary:
+      "Generate Lorem Ipsum placeholder text for mockups, websites, and UI prototypes.",
+    description:
+      "Create classic or random Lorem Ipsum as paragraphs, sentences, words, or exact character lengths. Copy or download plain text, HTML, or Markdown — all processed locally in your browser.",
+    keywords: [
+      "lorem ipsum generator",
+      "lorem ipsum",
+      "dummy text generator",
+      "placeholder text generator",
+      "lorem ipsum text",
+      "lorem ipsum paragraphs",
+      "free lorem ipsum generator",
+      "generate lorem ipsum",
+      "lorem ipsum copy and paste",
+      "lorem ipsum HTML generator",
+    ],
+    href: "/lorem-ipsum-generator",
+    icon: "lorem",
+  },
+];
+
+export function getPublishedTools(): PublishedTool[] {
+  return tools.filter(isPublishedTool);
+}
+
+export function getPlannedTools(): ToolDefinition[] {
+  return tools.filter((tool) => tool.status === "planned");
+}
+
+export function getToolBySlug(slug: string): ToolDefinition | undefined {
+  return tools.find((tool) => tool.slug === slug);
+}
+
+export function getPublishedToolBySlug(slug: string): PublishedTool | undefined {
+  const tool = getToolBySlug(slug);
+  return tool && isPublishedTool(tool) ? tool : undefined;
+}
+
+export function searchPublishedTools(query: string): PublishedTool[] {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) {
+    return getPublishedTools();
+  }
+
+  return getPublishedTools().filter((tool) => {
+    const haystack = [
+      tool.name,
+      tool.summary,
+      tool.description,
+      ...tool.keywords,
+    ]
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(normalized);
+  });
+}
+
+export function getCategoryById(id: ToolCategory["id"]): ToolCategory | undefined {
+  return toolCategories.find((category) => category.id === id);
+}
+
+/** Show directory search only once enough tools are published to need it. */
+export const TOOL_SEARCH_MIN_COUNT = 3;
+
+export function shouldShowToolDirectorySearch(): boolean {
+  return getPublishedTools().length >= TOOL_SEARCH_MIN_COUNT;
+}

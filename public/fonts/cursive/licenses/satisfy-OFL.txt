@@ -1,0 +1,4 @@
+﻿Copyright (c) 2011 by Sideshow, Inc, with Reserved Font Name "Satisfy".
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+https://openfontlicense.org
+Font sourced from Google Fonts distribution for WordMelo self-hosting.
