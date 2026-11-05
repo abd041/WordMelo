@@ -16,9 +16,8 @@ export function Hero() {
             Free Online Text & Writing Tools
           </h1>
           <p className="mt-5 max-w-lg text-[1.05rem] leading-8 text-ink-muted sm:text-lg sm:leading-8">
-            Count words, check characters, and make writing easier with fast,
-            free browser-based utilities. Start with WordMelo&apos;s live Word
-            Counter.
+            Count words, convert text, format titles, and generate words with
+            fast, free online tools.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             {primaryTool ? (

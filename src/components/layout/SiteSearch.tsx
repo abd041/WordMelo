@@ -35,7 +35,7 @@ export function SiteSearch({
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search tools…"
+          placeholder="Search free text tools..."
           autoComplete="off"
           className="h-11 w-full rounded-control border border-line bg-surface pl-10 pr-3 text-sm text-ink placeholder:text-ink-soft focus:border-accent"
         />
