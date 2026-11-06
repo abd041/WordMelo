@@ -270,6 +270,27 @@ export function analyzeText(
   };
 }
 
+/** Words divided by sentences. Null when either count is zero. */
+export function averageWordsPerSentence(
+  words: number,
+  sentences: number,
+): number | null {
+  if (words <= 0 || sentences <= 0) return null;
+  return Math.round((words / sentences) * 10) / 10;
+}
+
+/**
+ * Characters excluding whitespace, divided by words.
+ * Null when there are no words.
+ */
+export function averageCharactersPerWord(
+  charactersWithoutSpaces: number,
+  words: number,
+): number | null {
+  if (words <= 0 || charactersWithoutSpaces < 0) return null;
+  return Math.round((charactersWithoutSpaces / words) * 10) / 10;
+}
+
 export function formatDuration(totalSeconds: number): string {
   if (totalSeconds <= 0) return "0 sec";
 

@@ -11,16 +11,18 @@ import { siteConfig } from "@/lib/site";
 import { WORD_COUNTER_RULES_SUMMARY } from "@/lib/tools/word-counter/rules";
 
 export const metadata = createPageMetadata({
-  title: "Word Counter — Count Words, Characters & Reading Time",
+  title: "Free Word Counter Online – Words & Characters | WordMelo",
   description:
-    "Free online word counter with live word, character, sentence, paragraph, reading time, speaking time, and word frequency stats. Runs privately in your browser.",
+    "Count words, characters, sentences, paragraphs and reading time instantly with WordMelo's free online Word Counter. Private, accurate and easy to use.",
   path: "/word-counter",
   keywords: [
     "word counter",
-    "online word counter",
-    "character count",
+    "free word counter",
+    "word counter online",
+    "word count checker",
+    "character counter",
+    "essay word counter",
     "reading time calculator",
-    "word frequency",
   ],
 });
 
@@ -47,6 +49,36 @@ const faqItems = [
   {
     question: "How accurate is the page estimate?",
     answer: `The optional page estimate divides word count by ${siteConfig.wordsPerPageEstimate}, a common rough figure for double-spaced manuscript pages. Actual printed or paginated length depends on font, margins, spacing, and layout.`,
+  },
+  {
+    question: "Are spaces included in the character count?",
+    answer:
+      "The Characters card labeled “With spaces” includes spaces, tabs, and line breaks. “Without spaces” removes whitespace. Graphemes are a separate count of perceived characters, which matters for emoji.",
+  },
+  {
+    question: "How are hyphenated words counted?",
+    answer:
+      "A hyphenated compound such as well-known is usually one word when the browser’s word segmenter treats it as a single word-like token. Contractions such as don't are also usually one word. Punctuation alone is not counted.",
+  },
+  {
+    question: "Can I count words in an essay?",
+    answer:
+      "Yes. Paste the essay, set a word goal such as 500 or 1,000, and watch the remaining count. The tool does not enforce a school’s rules about titles, citations, or footnotes.",
+  },
+  {
+    question: "Does WordMelo store my text?",
+    answer:
+      "Counting stays in your browser. Autosave is off until you turn it on. If you enable it, the draft is written to this browser’s local storage and can be deleted from the same control. WordMelo does not upload the draft for analysis.",
+  },
+  {
+    question: "Is the word counter free, and does it work on mobile?",
+    answer:
+      "Yes. The Word Counter is free and does not require an account. The editor and statistics work on phones as well as desktops.",
+  },
+  {
+    question: "Why might WordMelo and Microsoft Word show different counts?",
+    answer:
+      "Applications disagree on hyphenated compounds, numbers, contractions, and text inside fields Word cannot see in a paste. WordMelo counts the text in the editor with the rules listed on this page. Compare the same pasted passage, not a file that still contains notes or text boxes.",
   },
 ];
 
@@ -97,8 +129,8 @@ export default function WordCounterPage() {
         ]}
       >
         <ToolHeader
-          title="Word Counter"
-          description="Get live word, character, sentence, and paragraph counts plus reading time, speaking time, and word frequency — processed locally in your browser."
+          title="Free Online Word Counter"
+          description="Count words, characters, sentences, and paragraphs as you type. Check a word goal, keyword density, reading time, and an English readability estimate — privately in your browser."
         />
 
         <WordCounterApp />
@@ -176,12 +208,44 @@ export default function WordCounterPage() {
               timing is critical.
             </p>
 
+            <h2>How keyword density is calculated</h2>
+            <p>
+              Each row is a word or a short phrase from your draft. Density is
+              that phrase’s count divided by the number of words, or by the
+              number of adjacent two-word or three-word sequences. Hiding stop
+              words removes entries such as “the” from the table. It does not
+              shrink the denominator, so the percentage remains a share of the
+              whole draft. A higher percentage is not a ranking recommendation.
+            </p>
+
+            <h2>How readability scores are estimated</h2>
+            <p>
+              Reading ease and grade level use the Flesch formulas with an
+              estimated syllable count for English spelling. Very short or very
+              simple sentences can produce a grade below 1. Scores are hidden
+              when the draft is mostly another writing system, because the
+              formulas were not designed for that text. They do not judge
+              whether the writing is good.
+            </p>
+
+            <h2>Word counter for students and writers</h2>
+            <ul>
+              <li>Students can check an essay or assignment against a word goal.</li>
+              <li>Writers can watch article, story, and manuscript length.</li>
+              <li>Creators can estimate reading time for a page or caption.</li>
+              <li>Professionals can measure an email, report, or talk.</li>
+            </ul>
+            <p>
+              Schools, publishers, and clients set their own length rules.
+              WordMelo does not claim an ideal article length.
+            </p>
+
             <h2>Practical use cases</h2>
             <ul>
               <li>Checking essay, personal statement, or scholarship limits.</li>
               <li>Estimating blog post reading time before publishing.</li>
               <li>Timing talks, pitches, and classroom presentations.</li>
-              <li>Reviewing repeated words with the frequency table.</li>
+              <li>Reviewing repeated words with keyword density.</li>
               <li>Quickly measuring pasted email or documentation drafts.</li>
             </ul>
 

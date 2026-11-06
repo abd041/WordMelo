@@ -39,8 +39,8 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line/80 bg-paper/90 backdrop-blur-md">
-      <div className="container-page flex h-16 items-center justify-between gap-4 lg:h-[4.25rem]">
+    <header className="sticky top-0 z-40 overflow-visible border-b border-line/80 bg-paper/90 backdrop-blur-md">
+      <div className="container-page flex h-16 items-center justify-between gap-4 overflow-visible lg:h-[4.25rem]">
         <Logo />
 
         <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
@@ -57,7 +57,7 @@ export function Header() {
 
         {showSearch ? (
           <div className="hidden w-full max-w-xs lg:block">
-            <SiteSearch id="desktop-site-search" />
+            <SiteSearch id="desktop-site-search" panel="overlay" />
           </div>
         ) : null}
 

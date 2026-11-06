@@ -54,11 +54,17 @@ export default function PrivacyPage() {
             <li>Favorite fancy-text or cursive styles</li>
             <li>Favorite random words or short generation history</li>
             <li>Custom title-case spelling exceptions</li>
+            <li>
+              An optional Word Counter draft, saved only after you turn autosave
+              on, and deleted when you turn it off
+            </li>
           </ul>
           <p>
-            This data stays in your browser. Clearing site data in your browser
-            removes it. WordMelo does not sync these preferences to a server
-            account (there is no product account system today).
+            This data stays in your browser. A saved draft is the text you typed,
+            not just a preference, and browser storage is not an encrypted vault
+            provided by WordMelo. Clearing site data in your browser removes it.
+            WordMelo does not sync these values to a server account (there is no
+            product account system today).
           </p>
 
           <h2>Information we may receive automatically</h2>
