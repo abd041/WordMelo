@@ -183,7 +183,11 @@ export default function CursiveGeneratorPage() {
               <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-muted">
                 <li>Open Copy & Paste Cursive.</li>
                 <li>
-                  Type a phrase such as{" "}
+                  Type one word or a phrase, such as{" "}
+                  <code className="rounded bg-mint px-1.5 py-0.5 text-ink">
+                    Beautiful
+                  </code>{" "}
+                  or{" "}
                   <code className="rounded bg-mint px-1.5 py-0.5 text-ink">
                     {CURSIVE_SAMPLE_TEXT}
                   </code>

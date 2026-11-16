@@ -146,9 +146,7 @@ export function CursiveUnicodePanel({
   }, []);
 
   useEffect(() => {
-    if (nameMode) setFilter("name");
-    else if (filter === "name") setFilter("all");
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to nameMode flips
+    if (nameMode) setFilter("all");
   }, [nameMode]);
 
   const results = useMemo(() => generateAllCursiveStyles(text), [text]);
@@ -275,8 +273,10 @@ export function CursiveUnicodePanel({
 
       {nameMode ? (
         <p className="rounded-control border border-accent/25 bg-accent-soft/60 px-3 py-2 text-sm text-ink">
-          Name Mode focuses short personalizations. Copy a Unicode design, then
-          open Handwriting Studio to download a PNG of the same name.
+          Name Mode is for a short name. Mathematical Script and Bold
+          Mathematical Script are the letters you can copy and paste. Name
+          Designs add a flourish. Handwriting Studio downloads the same name
+          as a PNG.
         </p>
       ) : null}
 

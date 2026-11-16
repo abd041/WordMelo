@@ -4,7 +4,10 @@ import { useState } from "react";
 import { PenLine, Type } from "lucide-react";
 import { CursiveHandwritingStudio } from "@/components/tools/cursive-generator/CursiveHandwritingStudio";
 import { CursiveUnicodePanel } from "@/components/tools/cursive-generator/CursiveUnicodePanel";
-import { CURSIVE_SAMPLE_TEXT } from "@/lib/tools/cursive-generator";
+import {
+  CURSIVE_SAMPLE_NAME,
+  CURSIVE_SAMPLE_TEXT,
+} from "@/lib/tools/cursive-generator";
 import { cn } from "@/lib/utils";
 
 type MainTab = "unicode" | "handwriting";
@@ -104,9 +107,18 @@ export function CursiveGeneratorApp() {
             text={text}
             onTextChange={setText}
             nameMode={focus === "name"}
-            onNameModeChange={(enabled) =>
-              setFocus(enabled ? "name" : "phrase")
-            }
+            onNameModeChange={(enabled) => {
+              setFocus(enabled ? "name" : "phrase");
+              setText((current) => {
+                if (enabled && current === CURSIVE_SAMPLE_TEXT) {
+                  return CURSIVE_SAMPLE_NAME;
+                }
+                if (!enabled && current === CURSIVE_SAMPLE_NAME) {
+                  return CURSIVE_SAMPLE_TEXT;
+                }
+                return current;
+              });
+            }}
             onOpenHandwriting={openHandwriting}
           />
         ) : null}
