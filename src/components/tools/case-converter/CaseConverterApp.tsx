@@ -6,6 +6,7 @@ import {
   useId,
   useMemo,
   useState,
+  type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import {
   ArrowDownUp,
@@ -20,6 +21,7 @@ import { FeedbackMessage } from "@/components/ui/FeedbackMessage";
 import {
   CASE_MODE_EXAMPLE_SOURCE,
   CASE_MODE_GROUPS,
+  CASE_MODES,
   type CaseModeId,
   convertCase,
   getCaseMode,
@@ -49,15 +51,16 @@ export function CaseConverterApp() {
 
   const exactOutput = useMemo(() => convertCase(input, mode), [input, mode]);
   const output = useDeferredValue(exactOutput);
+  const deferredInput = useDeferredValue(input);
   const activeMode = getCaseMode(mode);
   const modePreview = useMemo(
     () => convertCase(CASE_MODE_EXAMPLE_SOURCE, mode),
     [mode],
   );
 
-  const inputWords = countWords(input);
-  const inputChars = countCharactersWithSpaces(input);
-  const outputWords = countWords(output);
+  const inputWords = useMemo(() => countWords(deferredInput), [deferredInput]);
+  const inputChars = countCharactersWithSpaces(deferredInput);
+  const outputWords = useMemo(() => countWords(output), [output]);
   const outputChars = countCharactersWithSpaces(output);
   const lineCount = Math.max(1, input.split("\n").length);
   const textareaRows = Math.min(12, Math.max(5, lineCount + 2));
@@ -92,8 +95,8 @@ export function CaseConverterApp() {
         })();
       } else if (key === "s") {
         event.preventDefault();
+        if (input && input !== SAMPLE_TEXT) setUndoInput(input);
         setInput(SAMPLE_TEXT);
-        setUndoInput(null);
         showFeedback("Sample text loaded", "success");
       }
     }
@@ -158,9 +161,30 @@ export function CaseConverterApp() {
   }
 
   function handleClear() {
+    if (!input) return;
+    setUndoInput(input);
     setInput("");
-    setUndoInput(null);
-    showFeedback("Editor cleared", "neutral");
+    showFeedback("Editor cleared — Undo available", "neutral");
+  }
+
+  function moveMode(current: CaseModeId, event: ReactKeyboardEvent<HTMLButtonElement>) {
+    const index = CASE_MODES.findIndex((item) => item.id === current);
+    let next = index;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      next = (index + 1) % CASE_MODES.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      next = (index - 1 + CASE_MODES.length) % CASE_MODES.length;
+    } else if (event.key === "Home") {
+      next = 0;
+    } else if (event.key === "End") {
+      next = CASE_MODES.length - 1;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    const nextId = CASE_MODES[next]!.id;
+    setMode(nextId);
+    document.getElementById(`case-mode-${nextId}`)?.focus();
   }
 
   return (
@@ -192,7 +216,7 @@ export function CaseConverterApp() {
           </span>
         </div>
 
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 space-y-4" role="radiogroup" aria-label="Conversion mode">
           {CASE_MODE_GROUPS.map((group) => {
             const modes = getCaseModesByGroup(group.id);
             return (
@@ -203,21 +227,20 @@ export function CaseConverterApp() {
                   </h3>
                   <span className="text-xs text-ink-soft">{group.blurb}</span>
                 </div>
-                <div
-                  role="radiogroup"
-                  aria-label={group.label}
-                  className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4"
-                >
+                <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
                   {modes.map((item) => {
                     const selected = mode === item.id;
                     return (
                       <button
                         key={item.id}
+                        id={`case-mode-${item.id}`}
                         type="button"
                         role="radio"
                         aria-checked={selected}
+                        tabIndex={selected ? 0 : -1}
                         aria-label={`${item.label}. ${item.description}. Example: ${convertCase(CASE_MODE_EXAMPLE_SOURCE, item.id)}`}
                         onClick={() => setMode(item.id)}
+                        onKeyDown={(event) => moveMode(item.id, event)}
                         className={cn(
                           "rounded-control border px-2.5 py-2 text-left transition-colors duration-200",
                           selected
@@ -259,8 +282,8 @@ export function CaseConverterApp() {
                 variant="secondary"
                 size="sm"
                 onClick={() => {
+                  if (input && input !== SAMPLE_TEXT) setUndoInput(input);
                   setInput(SAMPLE_TEXT);
-                  setUndoInput(null);
                   showFeedback("Sample text loaded", "success");
                 }}
               >
@@ -401,7 +424,7 @@ export function CaseConverterApp() {
                   variant="ghost"
                   size="sm"
                   onClick={handleUndoReplace}
-                  aria-label="Undo last use as input"
+                  aria-label="Undo the last replacement of the original text"
                 >
                   <Undo2 className="h-4 w-4" aria-hidden />
                   Undo

@@ -10,7 +10,7 @@ import { absoluteUrl, createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
   title: "Random Letter Generator — Pick Letters A to Z | WordMelo",
   description:
-    "Pick random letters A–Z instantly. Generate vowels, consonants, unique sequences, or spin an alphabet wheel. Free, customizable, and easy to use.",
+    "Generate a random letter from A to Z instantly. Pick vowels, consonants, or multiple letters, spin an alphabet wheel, and choose letters without repeats.",
   path: "/random-letter-generator",
   keywords: [
     "random letter generator",
@@ -38,7 +38,7 @@ const faqItems = [
   {
     question: "How do I generate a random letter from A to Z?",
     answer:
-      "Open Instant Letter Picker, keep the A–Z pool, and press Generate Random Letter. Space or G also generates when focus is not in an input field.",
+      "Open Single Letter, keep the A–Z pool, and press Generate Random Letter. Space or G also generates when focus is not on a button or text field.",
   },
   {
     question: "Is the Random Letter Generator free?",
@@ -79,6 +79,11 @@ const faqItems = [
     question: "How does the alphabet wheel choose a letter?",
     answer:
       "The letter is selected with the same unbiased sampler first; the wheel only animates to that predetermined segment. Reduced-motion users get an immediate update. The result is always shown in plain text.",
+  },
+  {
+    question: "Are all letters equally likely?",
+    answer:
+      "With the full A–Z pool and repeats allowed, each letter has probability 1/26 on an independent draw. Vowels are 1/5 each. Consonants are 1/21 each when Y is a consonant. A custom pool, exclusions, and no-repeat mode change those chances. Each mode keeps its own no-repeat session until you reset it.",
   },
   {
     question: "Does WordMelo generate letters locally?",
@@ -135,8 +140,8 @@ export default function RandomLetterGeneratorPage() {
         className="pt-6 sm:pt-8"
       >
         <ToolHeader
-          title="Random Letter Generator — Pick Random Letters A to Z"
-          description="Generate random letters instantly. Choose vowels, consonants, or custom letters, create unique sequences, or spin an interactive alphabet wheel."
+          title="Random Letter Generator"
+          description="Pick a random letter from A to Z instantly. Choose vowels, consonants, or custom letters, and try the alphabet wheel."
           privacyNote="Letter picks stay local in your browser and are not uploaded."
         />
 
@@ -158,7 +163,7 @@ export default function RandomLetterGeneratorPage() {
           <div>
             <h2>How to generate a random letter</h2>
             <ol>
-              <li>Choose Instant Letter Picker, Multiple Letters, or Alphabet Wheel.</li>
+              <li>Choose Single Letter, Multiple Letters, or Alphabet Wheel.</li>
               <li>Set the pool (A–Z, vowels, consonants, or custom) and case.</li>
               <li>Press Generate, Spin, or Shuffle — then copy or download results.</li>
             </ol>
@@ -253,11 +258,18 @@ export default function RandomLetterGeneratorPage() {
             <h2>How random selection works</h2>
             <p>
               Eligible letters are filtered first. Uniform draws use{" "}
-              <code>crypto.getRandomValues</code> with rejection sampling when
-              available so each remaining base letter has equal chance. Mixed case
+              <code>crypto.getRandomValues</code> with rejection sampling so
+              each remaining base letter has an equal chance. Mixed case
               chooses display case independently after the base letter is picked.
               Unique and no-repeat modes are conditioned draws, not independent
-              1/26 probabilities.
+              1/26 probabilities. With the default A–Z pool, each letter’s share
+              is 1/26 (about 3.85%). Vowels only is 1/5 (20%) per vowel.
+              Consonants only is 1/21 (about 4.76%) per consonant when Y stays a
+              consonant. Those shares change if you exclude letters, use a
+              custom pool, or turn on no-repeat. If the browser cannot provide
+              a secure random source, WordMelo does not substitute a weaker
+              generator — it shows an error and draws nothing. Single Letter
+              and the Alphabet Wheel keep separate no-repeat sessions.
             </p>
           </div>
 
@@ -324,7 +336,16 @@ export default function RandomLetterGeneratorPage() {
 
         <ToolFAQ title="Frequently asked questions" items={faqItems} />
 
-        <RelatedTools currentToolId="random-letter-generator" />
+        <RelatedTools
+          currentToolId="random-letter-generator"
+          preferredIds={[
+            "random-word-generator",
+            "pictionary-word-generator",
+            "word-counter",
+            "character-counter",
+          ]}
+          limit={6}
+        />
       </ToolShell>
     </>
   );

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { generateWords, sampleWithoutReplacement } from "./sample";
-import { createSeededRandomInt } from "./rng";
+import {
+  generateWords,
+  sampleWithoutReplacement,
+  SECURE_RANDOM_MESSAGE,
+} from "./sample";
+import { createSeededRandomInt, SecureRandomUnavailableError } from "./rng";
 import { DEFAULT_FILTERS, POS_NOUN, type VocabEntry } from "./types";
 
 const pool: VocabEntry[] = Array.from({ length: 20 }, (_, i) => ({
@@ -96,5 +100,28 @@ describe("generateWords", () => {
     expect(result.words).toEqual([]);
     expect(result.exhausted).toBe(true);
     expect(result.message).toMatch(/No words match/);
+  });
+
+  it("does not fall back to Math.random when secure random is missing", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, "crypto");
+    Object.defineProperty(globalThis, "crypto", {
+      configurable: true,
+      value: undefined,
+    });
+    try {
+      const result = generateWords(pool, {
+        ...DEFAULT_FILTERS,
+        count: 2,
+        vocabulary: "all",
+        difficulty: "all",
+      });
+      expect(result.words).toEqual([]);
+      expect(result.message).toBe(SECURE_RANDOM_MESSAGE);
+      expect(() =>
+        sampleWithoutReplacement(pool, 2),
+      ).toThrow(SecureRandomUnavailableError);
+    } finally {
+      if (descriptor) Object.defineProperty(globalThis, "crypto", descriptor);
+    }
   });
 });

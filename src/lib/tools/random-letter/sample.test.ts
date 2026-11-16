@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { createSeededRandomInt } from "./rng";
+import { createSeededRandomInt, SecureRandomUnavailableError } from "./rng";
 import {
   applyCase,
   clampCount,
   drawMany,
   drawOne,
   fisherYatesShuffle,
+  runSecureDraw,
+  SECURE_RANDOM_MESSAGE,
   shuffleAlphabet,
 } from "./sample";
 import { DEFAULT_FILTERS, DEFAULT_MULTIPLE } from "./types";
@@ -134,5 +136,23 @@ describe("random letter sampling", () => {
     );
     expect(result.bases).toHaveLength(26);
     expect(new Set(result.bases).size).toBe(26);
+  });
+
+  it("refuses to draw when a secure random source is missing", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, "crypto");
+    Object.defineProperty(globalThis, "crypto", {
+      configurable: true,
+      value: undefined,
+    });
+    try {
+      const result = runSecureDraw(() => drawOne(DEFAULT_FILTERS));
+      expect(result.letters).toEqual([]);
+      expect(result.message).toBe(SECURE_RANDOM_MESSAGE);
+      expect(() => drawOne(DEFAULT_FILTERS)).toThrow(SecureRandomUnavailableError);
+    } finally {
+      if (descriptor) {
+        Object.defineProperty(globalThis, "crypto", descriptor);
+      }
+    }
   });
 });

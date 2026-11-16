@@ -12,6 +12,7 @@ import {
   eligiblePool,
   formatLetters,
   poolLabel,
+  runSecureDraw,
   shuffleAlphabet,
   type LetterFilters,
   type MultipleSettings,
@@ -62,7 +63,7 @@ export function MultipleLettersPanel({
   useEffect(() => {
     if (!shuffleToken || shuffleToken === lastShuffle.current) return;
     lastShuffle.current = shuffleToken;
-    const result = shuffleAlphabet(filters);
+    const result = runSecureDraw(() => shuffleAlphabet(filters));
     setLetters(result.letters);
     setBases(result.bases);
     setFeedback(
@@ -76,11 +77,13 @@ export function MultipleLettersPanel({
   }, [shuffleToken, filters]);
 
   function generate(shuffle = false) {
-    const result = shuffle
-      ? shuffleAlphabet(filters)
-      : drawMany(filters, settings, {
-          usedBase: filters.noRepeatSession ? used : undefined,
-        });
+    const result = runSecureDraw(() =>
+      shuffle
+        ? shuffleAlphabet(filters)
+        : drawMany(filters, settings, {
+            usedBase: filters.noRepeatSession ? used : undefined,
+          }),
+    );
 
     if (result.letters.length === 0) {
       setLetters([]);

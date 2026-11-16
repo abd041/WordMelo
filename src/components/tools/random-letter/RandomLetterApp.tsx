@@ -25,20 +25,20 @@ const TABS: Array<{
 }> = [
   {
     id: "instant",
-    label: "Instant Letter Picker",
-    blurb: "One large random letter from your pool.",
+    label: "Single Letter",
+    blurb: "One large letter from A to Z.",
     Icon: Dices,
   },
   {
     id: "multiple",
     label: "Multiple Letters",
-    blurb: "Batches, formats, shuffle, and TXT export.",
+    blurb: "Batches, shuffle, and a text file.",
     Icon: Layers3,
   },
   {
     id: "wheel",
     label: "Alphabet Wheel",
-    blurb: "Spin to a fair predetermined letter.",
+    blurb: "Spin to a letter chosen first.",
     Icon: Disc3,
   },
 ];
@@ -92,6 +92,7 @@ export function RandomLetterApp() {
                       ? TABS[(idx + 1) % TABS.length]!
                       : TABS[(idx - 1 + TABS.length) % TABS.length]!;
                   setTab(next.id);
+                  document.getElementById(`letter-tab-${next.id}`)?.focus();
                 }
               }}
               className={cn(

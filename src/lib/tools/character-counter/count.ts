@@ -181,3 +181,20 @@ export function analyzeUnicodeDemo(id: UnicodeDemoExample["id"]): CharacterStats
   const demo = UNICODE_DEMOS.find((d) => d.id === id) ?? UNICODE_DEMOS[0]!;
   return analyzeCharacters(demo.text);
 }
+
+/**
+ * Stats for a highlighted slice. Offsets are UTF-16 indexes, matching
+ * textarea selectionStart/selectionEnd. Returns null when nothing is selected.
+ */
+export function analyzeSelection(
+  text: string,
+  start: number,
+  end: number,
+): CharacterStats | null {
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+  const length = text.length;
+  const from = Math.max(0, Math.min(length, Math.trunc(Math.min(start, end))));
+  const to = Math.max(0, Math.min(length, Math.trunc(Math.max(start, end))));
+  if (to <= from) return null;
+  return analyzeCharacters(text.slice(from, to));
+}

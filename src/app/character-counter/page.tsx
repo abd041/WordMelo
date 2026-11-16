@@ -6,12 +6,15 @@ import { ToolFAQ } from "@/components/tools/ToolFAQ";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import { ToolShell } from "@/components/tools/ToolShell";
 import { absoluteUrl, createPageMetadata } from "@/lib/seo";
-import { CHARACTER_COUNTER_RULES_SUMMARY } from "@/lib/tools/character-counter";
+import {
+  CHARACTER_COUNTER_RULES_SUMMARY,
+  analyzeCharacters,
+} from "@/lib/tools/character-counter";
 
 export const metadata = createPageMetadata({
-  title: "Character Counter — Count Characters Online | WordMelo",
+  title: "Character Counter — With & Without Spaces | WordMelo",
   description:
-    "Count characters with or without spaces, letters, words, and Unicode text length. Check custom character limits instantly with WordMelo's free Character Counter.",
+    "Free online character counter. Count characters with and without spaces, letters and words instantly. Check text limits, Unicode characters and UTF-8 bytes.",
   path: "/character-counter",
   keywords: [
     "character counter",
@@ -85,6 +88,11 @@ const faqItems = [
     answer:
       "No. Counting, limit checks, copy, and TXT download run locally in your browser. Editor contents are not uploaded for analysis.",
   },
+  {
+    question: "How are line breaks counted?",
+    answer:
+      "A line break counts as a character. A Windows CRLF pair is two UTF-16 units. The line total treats CR, LF, and CRLF as one break: an empty editor has 0 lines, and a trailing newline adds an extra line. Paragraphs are blocks separated by a blank line.",
+  },
 ];
 
 export default function CharacterCounterPage() {
@@ -135,8 +143,8 @@ export default function CharacterCounterPage() {
         className="pt-6 sm:pt-8"
       >
         <ToolHeader
-          title="Character Counter — Count Characters Online"
-          description="Count characters, letters, words and spaces instantly. Check custom character limits and explore Unicode text length—all in your browser."
+          title="Character Counter"
+          description="Count characters with and without whitespace, plus letters and words, as you type. Limits and Unicode details stay in your browser."
           privacyNote="Text stays in your browser — nothing is uploaded for counting."
         />
 
@@ -202,6 +210,24 @@ export default function CharacterCounterPage() {
                 </thead>
                 <tbody className="text-ink-muted">
                   <tr className="border-b border-line">
+                    <td className="px-3 py-2.5 font-mono text-ink">Hello World</td>
+                    <td className="px-3 py-2.5 tabular-nums">
+                      {analyzeCharacters("Hello World").charactersWithSpaces}
+                    </td>
+                    <td className="px-3 py-2.5 tabular-nums">
+                      {analyzeCharacters("Hello World").charactersWithoutSpaces}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-line">
+                    <td className="px-3 py-2.5 font-mono text-ink">Hello, world!</td>
+                    <td className="px-3 py-2.5 tabular-nums">
+                      {analyzeCharacters("Hello, world!").charactersWithSpaces}
+                    </td>
+                    <td className="px-3 py-2.5 tabular-nums">
+                      {analyzeCharacters("Hello, world!").charactersWithoutSpaces}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-line">
                     <td className="px-3 py-2.5 font-mono text-ink">Hi there</td>
                     <td className="px-3 py-2.5 tabular-nums">8</td>
                     <td className="px-3 py-2.5 tabular-nums">7</td>
@@ -235,7 +261,12 @@ export default function CharacterCounterPage() {
               analysis. Use this Character Counter for limits and Unicode
               detail; open the{" "}
               <Link href="/word-counter">Word Counter</Link> when reading or
-              speaking time matters.
+              speaking time matters. If the draft is stuck in the wrong
+              capitalization, change it with the{" "}
+              <Link href="/case-converter">Case Converter</Link>. For a headline,
+              use the{" "}
+              <Link href="/title-case-converter">Title Case Converter</Link> and
+              count the result again.
             </p>
           </div>
 
@@ -325,7 +356,16 @@ export default function CharacterCounterPage() {
 
         <ToolFAQ title="Frequently asked questions" items={faqItems} />
 
-        <RelatedTools currentToolId="character-counter" />
+        <RelatedTools
+          currentToolId="character-counter"
+          preferredIds={[
+            "word-counter",
+            "case-converter",
+            "title-case-converter",
+            "lorem-ipsum-generator",
+          ]}
+          limit={6}
+        />
       </ToolShell>
     </>
   );

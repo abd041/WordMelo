@@ -8,6 +8,7 @@ import { FeedbackMessage } from "@/components/ui/FeedbackMessage";
 import {
   drawOne,
   eligiblePool,
+  runSecureDraw,
   polarToCartesian,
   rotationToLandOn,
   segmentAngleDeg,
@@ -104,9 +105,11 @@ export function AlphabetWheelPanel({
       filters,
       filters.noRepeatSession ? used : undefined,
     );
-    const result = drawOne(filters, {
-      usedBase: filters.noRepeatSession ? used : undefined,
-    });
+    const result = runSecureDraw(() =>
+      drawOne(filters, {
+        usedBase: filters.noRepeatSession ? used : undefined,
+      }),
+    );
     if (!result.letters[0] || !result.bases[0]) {
       setFeedback({
         message: result.message ?? "No letters left on the wheel",
@@ -141,7 +144,9 @@ export function AlphabetWheelPanel({
       setRotation(nextRot);
       setLetter(nextLetter);
       setBase(nextBase);
-      setUsed((prev) => new Set(prev).add(nextBase));
+      if (filters.noRepeatSession) {
+        setUsed((prev) => new Set(prev).add(nextBase));
+      }
       setSpinning(false);
       return;
     }
@@ -162,7 +167,9 @@ export function AlphabetWheelPanel({
     timerRef.current = window.setTimeout(() => {
       setLetter(nextLetter);
       setBase(nextBase);
-      setUsed((prev) => new Set(prev).add(nextBase));
+      if (filters.noRepeatSession) {
+        setUsed((prev) => new Set(prev).add(nextBase));
+      }
       setSpinning(false);
       setTransitionOn(false);
       timerRef.current = null;

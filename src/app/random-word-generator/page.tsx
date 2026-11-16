@@ -10,7 +10,7 @@ import { absoluteUrl, createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
   title: "Random Word Generator — Free Words by Length & Type | WordMelo",
   description:
-    "Generate random English words for free. Choose nouns, verbs, adjectives, word length, difficulty, and letter filters. Copy or download results instantly.",
+    "Generate random English words instantly. Filter by nouns, verbs, adjectives, word length, difficulty, or starting letters. Copy or download for free.",
   path: "/random-word-generator",
   keywords: [
     "random word generator",
@@ -48,7 +48,7 @@ const faqItems = [
   {
     question: "How do I generate random English words?",
     answer:
-      "Choose a count, optionally set type, length, letters, and difficulty, then press Generate. Use Regenerate for another unique set with the same filters.",
+      "Choose a count, optionally set type, length, letters, and difficulty, then press Generate Random Words. Use Regenerate for another unique set with the same filters.",
   },
   {
     question: "Can I generate only nouns, verbs or adjectives?",
@@ -88,7 +88,7 @@ const faqItems = [
   {
     question: "Are the results truly random?",
     answer:
-      "Words are sampled uniformly from the filtered eligible pool using browser crypto randomness when available. That supports fair draws; it is not a claim of cryptographic security for the whole site.",
+      "Each draw is uniform over the words that match your filters. Sampling uses crypto.getRandomValues with rejection sampling. If that source is missing, WordMelo shows an error and does not substitute a weaker generator.",
   },
   {
     question: "Does WordMelo process everything locally?",
@@ -145,8 +145,8 @@ export default function RandomWordGeneratorPage() {
         className="pt-6 sm:pt-8"
       >
         <ToolHeader
-          title="Random Word Generator — Generate Random Words Online"
-          description="Generate random English words instantly. Filter by word type, length, difficulty, or starting and ending letters. Copy or download your results for free."
+          title="Random Word Generator"
+          description="Generate random English words instantly. Choose nouns, verbs, adjectives, word length, and difficulty, or use quick presets for writing and games."
           privacyNote="Words are generated locally in your browser and are not uploaded."
         />
 
@@ -171,7 +171,10 @@ export default function RandomWordGeneratorPage() {
               <li>Choose how many words you need (1–100).</li>
               <li>Optionally set word type, length, and letters.</li>
               <li>Open Advanced filters for difficulty and coverage if needed.</li>
-              <li>Press Generate — or start from a preset and edit afterward.</li>
+              <li>
+                Press Generate Random Words — or start from a preset and edit
+                afterward.
+              </li>
               <li>Copy one word, copy all, or download a UTF-8 TXT file.</li>
             </ol>
           </div>
@@ -266,7 +269,7 @@ export default function RandomWordGeneratorPage() {
             <h2>Random words for games</h2>
             <p>
               The Word Games preset produces general noun prompts for informal
-              play.               For starting letters instead of full words, open the{" "}
+              play. For starting letters instead of full words, open the{" "}
               <Link href="/random-letter-generator">
                 Random Letter Generator
               </Link>
@@ -284,8 +287,9 @@ export default function RandomWordGeneratorPage() {
             <h2>How WordMelo selects words randomly</h2>
             <p>
               Eligible words are filtered first. Then WordMelo samples uniformly
-              without replacement using <code>crypto.getRandomValues</code> when
-              available. If you ask for more unique words than remain, you get
+              without replacement using <code>crypto.getRandomValues</code> with
+              rejection sampling. If that source is missing, no words are
+              generated. If you ask for more unique words than remain, you get
               every available match plus a clear count message — never silent
               repeats.
             </p>
@@ -327,7 +331,16 @@ export default function RandomWordGeneratorPage() {
 
         <ToolFAQ title="Frequently asked questions" items={faqItems} />
 
-        <RelatedTools currentToolId="random-word-generator" />
+        <RelatedTools
+          currentToolId="random-word-generator"
+          preferredIds={[
+            "random-letter-generator",
+            "pictionary-word-generator",
+            "word-counter",
+            "character-counter",
+          ]}
+          limit={6}
+        />
       </ToolShell>
     </>
   );

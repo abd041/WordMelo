@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   analyzeCharacters,
+  analyzeSelection,
   analyzeUnicodeDemo,
   countCodePoints,
   countDigits,
@@ -27,6 +28,21 @@ describe("character counter basics", () => {
     expect(stats.words).toBe(0);
     expect(stats.lines).toBe(0);
     expect(stats.paragraphs).toBe(0);
+  });
+
+  it("counts Hello World with and without whitespace", () => {
+    const stats = analyzeCharacters("Hello World");
+    expect(stats.charactersWithSpaces).toBe(11);
+    expect(stats.charactersWithoutSpaces).toBe(10);
+    expect(stats.letters).toBe(10);
+    expect(stats.words).toBe(2);
+  });
+
+  it("keeps punctuation when whitespace is removed", () => {
+    const stats = analyzeCharacters("Hello, world!");
+    expect(stats.charactersWithSpaces).toBe(13);
+    expect(stats.charactersWithoutSpaces).toBe(12);
+    expect(stats.letters).toBe(10);
   });
 
   it("counts ASCII with spaces", () => {
@@ -91,9 +107,22 @@ describe("unicode metrics", () => {
   it("counts combining accents as separate code points but one grapheme when segmenter works", () => {
     const eAcute = "e\u0301"; // e + combining acute
     expect(countCodePoints(eAcute)).toBe(2);
+    expect(countUtf16Units(eAcute)).toBe(2);
+    expect(countUtf8Bytes(eAcute)).toBe(3);
     expect(countLetters(eAcute)).toBe(1);
     const graphemes = countForMetric(eAcute, "grapheme");
     expect(graphemes).toBe(1);
+  });
+
+  it("counts a skin-tone wave and a flag as one grapheme with extra bytes", () => {
+    const wave = "👋🏽";
+    const flag = "🇵🇰";
+    for (const sample of [wave, flag]) {
+      expect(countForMetric(sample, "grapheme")).toBe(1);
+      expect(countCodePoints(sample)).toBe(2);
+      expect(countUtf16Units(sample)).toBe(4);
+      expect(countUtf8Bytes(sample)).toBe(8);
+    }
   });
 
   it("counts precomposed accented letters as one of each basic metric", () => {
@@ -225,6 +254,27 @@ describe("grapheme precision policy (no silent code-point substitute)", () => {
     } finally {
       intlMutable.Segmenter = original;
     }
+  });
+});
+
+describe("selected text", () => {
+  it("counts only the highlighted slice", () => {
+    const stats = analyzeSelection("Hello World", 0, 5);
+    expect(stats?.charactersWithSpaces).toBe(5);
+    expect(stats?.words).toBe(1);
+    expect(stats?.letters).toBe(5);
+  });
+
+  it("returns null when the selection is empty or reversed into nothing", () => {
+    expect(analyzeSelection("Hello", 2, 2)).toBeNull();
+    expect(analyzeSelection("Hello", 5, 5)).toBeNull();
+    expect(analyzeSelection("", 0, 0)).toBeNull();
+  });
+
+  it("accepts a backwards range and clamps to the text", () => {
+    const stats = analyzeSelection("Hello", 8, 3);
+    expect(stats?.charactersWithSpaces).toBe(2);
+    expect(stats?.charactersWithoutSpaces).toBe(2);
   });
 });
 

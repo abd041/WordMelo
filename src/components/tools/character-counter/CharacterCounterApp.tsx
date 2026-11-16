@@ -1,6 +1,14 @@
 "use client";
 
-import { useDeferredValue, useId, useMemo, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { CopyButton } from "@/components/ui/CopyButton";
 import { DownloadButton } from "@/components/ui/DownloadButton";
 import { FeedbackMessage } from "@/components/ui/FeedbackMessage";
@@ -15,6 +23,7 @@ import {
   TXT_FILENAME,
   UNICODE_DEMOS,
   analyzeCharacters,
+  analyzeSelection,
   analyzeUnicodeDemo,
   clampLimit,
   computeLimitStatus,
@@ -33,7 +42,12 @@ export function CharacterCounterApp() {
   const editorId = useId();
   const limitId = useId();
   const progressId = useId();
+  const editorRef = useRef<HTMLTextAreaElement>(null);
   const [text, setText] = useState("");
+  const [selectionRange, setSelectionRange] = useState<{
+    start: number;
+    end: number;
+  } | null>(null);
   const [limitInput, setLimitInput] = useState("160");
   const [limit, setLimit] = useState(160);
   const [metric, setMetric] = useState<LimitMetric>("grapheme");
@@ -62,6 +76,37 @@ export function CharacterCounterApp() {
 
   const demoStats = useMemo(() => analyzeUnicodeDemo(demoId), [demoId]);
   const activeDemo = UNICODE_DEMOS.find((d) => d.id === demoId)!;
+  const selectedStats = useMemo(
+    () =>
+      selectionRange
+        ? analyzeSelection(text, selectionRange.start, selectionRange.end)
+        : null,
+    [text, selectionRange],
+  );
+
+  const syncSelection = useCallback(() => {
+    const el = editorRef.current;
+    if (!el || document.activeElement !== el) {
+      setSelectionRange((current) => (current === null ? current : null));
+      return;
+    }
+    const start = el.selectionStart ?? 0;
+    const end = el.selectionEnd ?? 0;
+    if (end <= start) {
+      setSelectionRange((current) => (current === null ? current : null));
+      return;
+    }
+    setSelectionRange((current) =>
+      current && current.start === start && current.end === end
+        ? current
+        : { start, end },
+    );
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("selectionchange", syncSelection);
+    return () => document.removeEventListener("selectionchange", syncSelection);
+  }, [syncSelection]);
 
   function showFeedback(
     message: string,
@@ -88,6 +133,7 @@ export function CharacterCounterApp() {
 
   function handleClear() {
     setText("");
+    setSelectionRange(null);
     showFeedback("Editor cleared", "neutral");
   }
 
@@ -110,43 +156,36 @@ export function CharacterCounterApp() {
 
   return (
     <div className="space-y-5 sm:space-y-6">
-      {/* Compact primary summary — single hierarchy source for live counts */}
-      <div
-        className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-[1.15rem] border border-line bg-surface px-4 py-3 shadow-soft sm:px-5"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <p className="text-sm text-ink-muted">
-          <span className="font-semibold tabular-nums text-ink">
-            {formatCount(stats.charactersWithSpaces)}
-          </span>{" "}
-          characters
-          <span className="text-ink-soft"> (UTF-16)</span>
-        </p>
-        <p className="text-sm text-ink-muted">
-          <span className="font-semibold tabular-nums text-ink">
-            {formatCount(stats.charactersWithoutSpaces)}
-          </span>{" "}
-          without whitespace
-        </p>
-        <p className="text-sm text-ink-muted">
-          <span className="font-semibold tabular-nums text-ink">
-            {formatCount(stats.letters)}
-          </span>{" "}
-          letters
-        </p>
-        <p className="text-sm text-ink-muted">
-          <span className="font-semibold tabular-nums text-ink">
-            {formatCount(stats.words)}
-          </span>{" "}
-          words
-        </p>
+      <section aria-label="Character counts">
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
+          <StatCard
+            label="Characters"
+            value={formatCount(stats.charactersWithSpaces)}
+            hint="UTF-16, including spaces"
+            emphasis="primary"
+          />
+          <StatCard
+            label="Without whitespace"
+            value={formatCount(stats.charactersWithoutSpaces)}
+            hint="Spaces, tabs, and line breaks removed"
+          />
+          <StatCard
+            label="Letters"
+            value={formatCount(stats.letters)}
+            hint="Unicode letters only"
+          />
+          <StatCard
+            label="Words"
+            value={formatCount(stats.words)}
+            hint="Same rules as Word Counter"
+          />
+        </div>
         {statsPending ? (
-          <p className="text-xs text-ink-soft" role="status">
-            Updating…
+          <p className="mt-2 text-xs text-ink-soft" role="status">
+            Updating counts…
           </p>
         ) : null}
-      </div>
+      </section>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.95fr)] lg:items-start lg:gap-6">
         {/* Editor */}
@@ -217,13 +256,48 @@ export function CharacterCounterApp() {
             Text to count characters
           </label>
           <textarea
+            ref={editorRef}
             id={editorId}
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onSelect={syncSelection}
+            onKeyUp={syncSelection}
+            onMouseUp={syncSelection}
             placeholder="Paste or type text to count characters, letters, spaces, and Unicode length…"
             spellCheck
             className="min-h-[14rem] w-full resize-y bg-transparent px-4 py-4 font-sans text-base leading-relaxed text-ink outline-none placeholder:text-ink-soft focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/40 sm:min-h-[16rem] sm:px-5 sm:text-[1.05rem] sm:leading-7 lg:min-h-[18rem]"
           />
+          {selectedStats ? (
+            <div className="border-t border-line bg-mint/30 px-4 py-3 sm:px-5">
+              <h3 className="text-sm font-semibold text-ink">Selected text</h3>
+              <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
+                <div>
+                  <dt className="text-xs text-ink-soft">Characters</dt>
+                  <dd className="font-semibold tabular-nums text-ink">
+                    {formatCount(selectedStats.charactersWithSpaces)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-ink-soft">Without whitespace</dt>
+                  <dd className="font-semibold tabular-nums text-ink">
+                    {formatCount(selectedStats.charactersWithoutSpaces)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-ink-soft">Letters</dt>
+                  <dd className="font-semibold tabular-nums text-ink">
+                    {formatCount(selectedStats.letters)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-ink-soft">Words</dt>
+                  <dd className="font-semibold tabular-nums text-ink">
+                    {formatCount(selectedStats.words)}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          ) : null}
         </section>
 
         {/* Limit checker */}

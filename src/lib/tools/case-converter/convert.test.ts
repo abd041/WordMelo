@@ -110,6 +110,12 @@ describe("sentence case", () => {
     expect(toSentenceCase("ask mr. smith next.")).toBe("Ask mr. smith next.");
   });
 
+  it("does not restore acronyms that were typed in all caps", () => {
+    expect(toSentenceCase("NASA OPENED AN OFFICE.")).toBe(
+      "Nasa opened an office.",
+    );
+  });
+
   it("capitalizes after genuine sentence periods", () => {
     expect(toSentenceCase("done. next task.")).toBe("Done. Next task.");
   });

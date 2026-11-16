@@ -9,6 +9,7 @@ import {
   drawOne,
   eligiblePool,
   poolLabel,
+  runSecureDraw,
   type LetterFilters,
 } from "@/lib/tools/random-letter";
 import { cn, copyTextToClipboard } from "@/lib/utils";
@@ -55,9 +56,11 @@ export function InstantPickerPanel({
   }, []);
 
   const generate = useCallback(() => {
-    const result = drawOne(filters, {
-      usedBase: filters.noRepeatSession ? used : undefined,
-    });
+    const result = runSecureDraw(() =>
+      drawOne(filters, {
+        usedBase: filters.noRepeatSession ? used : undefined,
+      }),
+    );
     if (!result.letters[0] || !result.bases[0]) {
       setLetter(null);
       setBase(null);
@@ -72,14 +75,14 @@ export function InstantPickerPanel({
     setLetter(nextLetter);
     setBase(nextBase);
     setRevealKey((k) => k + 1);
-    setUsed((prev) => {
-      const next = new Set(prev);
-      next.add(nextBase);
-      return next;
-    });
-    setRecent((prev) =>
-      [nextLetter, ...prev.filter((l) => l !== nextLetter)].slice(0, 12),
-    );
+    if (filters.noRepeatSession) {
+      setUsed((prev) => {
+        const next = new Set(prev);
+        next.add(nextBase);
+        return next;
+      });
+    }
+    setRecent((prev) => [nextLetter, ...prev].slice(0, 12));
     setFeedback(null);
   }, [filters, used]);
 
@@ -90,8 +93,18 @@ export function InstantPickerPanel({
   useEffect(() => {
     if (!active) return;
     function onKey(event: KeyboardEvent) {
-      const tag = (event.target as HTMLElement | null)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      const target = event.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (
+        target?.isContentEditable ||
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        tag === "BUTTON" ||
+        tag === "A"
+      ) {
+        return;
+      }
       if (event.key === "Escape" && focusMode) {
         setFocusMode(false);
         if (document.fullscreenElement) {

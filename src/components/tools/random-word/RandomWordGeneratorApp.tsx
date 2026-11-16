@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   Check,
   ChevronDown,
@@ -28,6 +28,7 @@ import {
   applyPreset,
   clampCount,
   clearHistory,
+  filterVocabulary,
   generateWords,
   loadFavorites,
   loadHistory,
@@ -83,6 +84,10 @@ export function RandomWordGeneratorApp() {
   const liveRef = useRef<HTMLParagraphElement>(null);
   const didAutoGenerate = useRef(false);
   const resultsRef = useRef<HTMLElement>(null);
+  const eligibleCount = useMemo(() => {
+    if (!entries) return 0;
+    return filterVocabulary(entries, filters).length;
+  }, [entries, filters]);
 
   useEffect(() => {
     setFavorites(loadFavorites());
@@ -150,7 +155,11 @@ export function RandomWordGeneratorApp() {
         showFeedback(msg, generated.exhausted ? "neutral" : "success");
         announce(msg);
         if (typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches) {
-          resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          resultsRef.current?.scrollIntoView({
+            behavior: reduce ? "auto" : "smooth",
+            block: "start",
+          });
         }
       } else {
         const msg = generated.message ?? "No words match these filters.";
@@ -702,23 +711,28 @@ export function RandomWordGeneratorApp() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2.5 sm:flex-row">
+            <p className="text-sm text-ink-muted">
+              {loading || !entries
+                ? "Counting matching words…"
+                : `${eligibleCount.toLocaleString("en-US")} word${eligibleCount === 1 ? "" : "s"} match these filters.`}
+            </p>
+
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
               <Button
                 type="button"
                 variant="primary"
                 size="lg"
-                className="flex-1 shadow-lift"
+                className="w-full shadow-lift sm:w-auto sm:flex-1"
                 disabled={busy}
                 onClick={() => runGenerate(filters, "generate")}
               >
                 <Shuffle className="h-4 w-4" aria-hidden />
-                Generate
+                Generate Random Words
               </Button>
               <Button
                 type="button"
                 variant="secondary"
                 size="lg"
-                className="flex-1"
                 disabled={busy || !result}
                 onClick={() => runGenerate(filters, "regenerate")}
               >

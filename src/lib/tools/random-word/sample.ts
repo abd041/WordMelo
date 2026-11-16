@@ -1,7 +1,13 @@
 import { filterVocabulary, describeEmptyPool, clampCount } from "./filter";
-import type { RandomIntFn } from "./rng";
-import { createCryptoRandomInt } from "./rng";
+import {
+  createCryptoRandomInt,
+  SecureRandomUnavailableError,
+  type RandomIntFn,
+} from "./rng";
 import type { GenerateResult, VocabEntry, WordFilters } from "./types";
+
+export const SECURE_RANDOM_MESSAGE =
+  "This browser could not provide a secure random source, so no words were generated.";
 
 /**
  * Sample `count` unique entries without replacement from `pool`
@@ -27,6 +33,30 @@ export function sampleWithoutReplacement(
 }
 
 export function generateWords(
+  entries: readonly VocabEntry[],
+  filters: WordFilters,
+  options: {
+    usedWords?: ReadonlySet<string>;
+    randomInt?: RandomIntFn;
+  } = {},
+): GenerateResult {
+  try {
+    return generateWordsUnsafe(entries, filters, options);
+  } catch (error) {
+    if (error instanceof SecureRandomUnavailableError) {
+      return {
+        words: [],
+        poolSize: 0,
+        requested: clampCount(filters.count),
+        exhausted: true,
+        message: SECURE_RANDOM_MESSAGE,
+      };
+    }
+    throw error;
+  }
+}
+
+function generateWordsUnsafe(
   entries: readonly VocabEntry[],
   filters: WordFilters,
   options: {

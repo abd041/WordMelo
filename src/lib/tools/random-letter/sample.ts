@@ -1,4 +1,8 @@
-import { createCryptoRandomInt, type RandomIntFn } from "./rng";
+import {
+  createCryptoRandomInt,
+  SecureRandomUnavailableError,
+  type RandomIntFn,
+} from "./rng";
 import {
   describeEmptyPool,
   eligiblePool,
@@ -58,6 +62,27 @@ export function fisherYatesShuffle(
     copy[j] = tmp;
   }
   return copy;
+}
+
+export const SECURE_RANDOM_MESSAGE =
+  "This browser could not provide a secure random source, so no letter was generated.";
+
+export function runSecureDraw(run: () => DrawResult): DrawResult {
+  try {
+    return run();
+  } catch (error) {
+    if (error instanceof SecureRandomUnavailableError) {
+      return {
+        letters: [],
+        bases: [],
+        poolSize: 0,
+        requested: 0,
+        exhausted: true,
+        message: SECURE_RANDOM_MESSAGE,
+      };
+    }
+    throw error;
+  }
 }
 
 export interface DrawResult {
