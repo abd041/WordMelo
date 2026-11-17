@@ -20,20 +20,20 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="mt-3 text-sm text-ink-muted">
-          Last updated: November 5, 2026 (Vercel Web Analytics)
+          Last updated: November 17, 2026
         </p>
         <div className="prose-wordmelo mt-6">
           <p>
             This policy describes how WordMelo (“we”, “our”) handles information
             for the website at {siteConfig.url}. It is written to match the
-            current public product (ten browser-local writing tools).
+            current public product: browser-local writing tools.
           </p>
 
           <h2>Browser-local tool processing</h2>
           <p>
             WordMelo’s tools run in your browser. Text you type or paste into a
             tool is processed on your device to generate counts, conversions,
-            styles, random samples, or placeholder content. That tool content is
+            styles, word clouds, random samples, or placeholder content. That tool content is
             not transmitted to WordMelo servers for processing, logging,
             analytics, or third-party analysis.
           </p>

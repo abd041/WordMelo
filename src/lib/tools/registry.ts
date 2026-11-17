@@ -288,6 +288,28 @@ export const tools: ToolDefinition[] = [
     href: "/lorem-ipsum-generator",
     icon: "lorem",
   },
+  {
+    id: "word-cloud-generator",
+    name: "Word Cloud Generator",
+    slug: "word-cloud-generator",
+    status: "published",
+    categoryId: "counting",
+    summary:
+      "Turn pasted text into a word cloud and download it as PNG or SVG.",
+    description:
+      "Create a word cloud from your own text. Filter common words, choose a shape and palette, then download a PNG or SVG — processed locally in your browser.",
+    keywords: [
+      "word cloud generator",
+      "free word cloud generator",
+      "word cloud maker",
+      "word cloud creator",
+      "word cloud generator from text",
+      "create a word cloud online",
+      "word cloud generator free",
+    ],
+    href: "/word-cloud-generator",
+    icon: "cloud",
+  },
 ];
 
 export function getPublishedTools(): PublishedTool[] {

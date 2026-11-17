@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   AlignLeft,
   CaseSensitive,
+  Cloud,
   Binary,
   Hash,
   Italic,
@@ -25,6 +26,7 @@ const icons = {
   pictionary: Pencil,
   letter: WholeWord,
   lorem: AlignLeft,
+  cloud: Cloud,
 } as const;
 
 interface ToolCardProps {
@@ -98,7 +100,9 @@ export function ToolCard({ tool, className, featured = false }: ToolCardProps) {
                             ? "Open Random Letter Generator"
                             : tool.id === "lorem-ipsum-generator"
                               ? "Open Lorem Ipsum Generator"
-                              : "Open tool"}
+                              : tool.id === "word-cloud-generator"
+                                ? "Open Word Cloud Generator"
+                                : "Open tool"}
           <span aria-hidden="true" className="ml-1">
             →
           </span>

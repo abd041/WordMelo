@@ -36,7 +36,8 @@ export interface ToolDefinition {
     | "random"
     | "pictionary"
     | "letter"
-    | "lorem";
+    | "lorem"
+    | "cloud";
 }
 
 export interface PublishedTool extends ToolDefinition {

@@ -38,7 +38,9 @@ export function HomeIntro() {
             </Link>{" "}
             for curated drawing prompts and local team play, and the{" "}
             <Link href="/lorem-ipsum-generator">Lorem Ipsum Generator</Link> for
-            design placeholder text. Only finished tools are listed as
+            design placeholder text, and the{" "}
+            <Link href="/word-cloud-generator">Word Cloud Generator</Link> to
+            picture which words repeat. Only finished tools are listed as
             available.
           </p>
         </div>

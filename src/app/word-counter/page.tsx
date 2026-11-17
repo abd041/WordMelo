@@ -247,6 +247,10 @@ export default function WordCounterPage() {
               <li>Timing talks, pitches, and classroom presentations.</li>
               <li>Reviewing repeated words with keyword density.</li>
               <li>Quickly measuring pasted email or documentation drafts.</li>
+              <li>
+                Seeing which words repeat in the{" "}
+                <Link href="/word-cloud-generator">Word Cloud Generator</Link>.
+              </li>
             </ul>
 
             <h2>Normalize casing or style a short bio</h2>
