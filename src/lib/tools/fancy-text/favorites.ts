@@ -1,6 +1,26 @@
+import { FANCY_STYLES } from "./styles";
+
 const FAVORITES_KEY = "wordmelo:fancy-text:favorites";
 const RECENT_KEY = "wordmelo:fancy-text:recent-copied";
 const MAX_RECENT = 12;
+
+const VALID_STYLE_IDS = new Set(FANCY_STYLES.map((style) => style.id));
+
+/** Drop duplicates, unknown ids, and anything past the cap. */
+export function sanitizeStyleIds(
+  ids: readonly string[],
+  limit = Number.POSITIVE_INFINITY,
+): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const id of ids) {
+    if (!VALID_STYLE_IDS.has(id) || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
 
 function readStringArray(key: string): string[] {
   if (typeof window === "undefined") return [];
@@ -25,11 +45,11 @@ function writeStringArray(key: string, ids: string[]): void {
 }
 
 export function readFavoriteStyleIds(): string[] {
-  return readStringArray(FAVORITES_KEY);
+  return sanitizeStyleIds(readStringArray(FAVORITES_KEY));
 }
 
 export function writeFavoriteStyleIds(ids: string[]): void {
-  writeStringArray(FAVORITES_KEY, ids);
+  writeStringArray(FAVORITES_KEY, sanitizeStyleIds(ids));
 }
 
 export function toggleFavoriteStyleId(
@@ -42,11 +62,11 @@ export function toggleFavoriteStyleId(
 }
 
 export function readRecentCopiedStyleIds(): string[] {
-  return readStringArray(RECENT_KEY);
+  return sanitizeStyleIds(readStringArray(RECENT_KEY), MAX_RECENT);
 }
 
 export function writeRecentCopiedStyleIds(ids: string[]): void {
-  writeStringArray(RECENT_KEY, ids.slice(0, MAX_RECENT));
+  writeStringArray(RECENT_KEY, sanitizeStyleIds(ids, MAX_RECENT));
 }
 
 /** Move a style id to the front of the recent-copied list. */

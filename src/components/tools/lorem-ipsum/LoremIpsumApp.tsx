@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { CopyButton } from "@/components/ui/CopyButton";
 import { DownloadButton } from "@/components/ui/DownloadButton";
 import { FeedbackMessage } from "@/components/ui/FeedbackMessage";
@@ -9,16 +9,20 @@ import {
   CHARACTER_METRIC_LABEL,
   LOREM_PRESETS,
   QUANTITY_LIMITS,
+  buildLoremSearch,
   createCryptoRandomInt,
-  documentToHtmlBody,
-  documentToMarkdown,
+  documentStatsText,
   downloadFilenameFor,
   generateLorem,
+  mimeTypeFor,
+  parseLoremSearch,
   presetsByGroup,
   serializeDocument,
   type GeneratedDocument,
   type GenerationMode,
   type HtmlExportMode,
+  type ListItemLength,
+  type ListStyle,
   type OutputFormat,
   type ParagraphLength,
 } from "@/lib/tools/lorem-ipsum";
@@ -33,7 +37,7 @@ import {
   countWords,
   tryCountGraphemes,
 } from "@/lib/tools/word-counter/count";
-import { cn } from "@/lib/utils";
+import { cn, copyTextToClipboard } from "@/lib/utils";
 
 type PreviewLayout = "article" | "landing" | "mobile" | "card";
 type OutputView = "source" | "rendered";
@@ -58,6 +62,7 @@ const MODE_OPTIONS: Array<{ id: GenerationMode; label: string; hint: string }> =
       label: "Characters",
       hint: CHARACTER_METRIC_LABEL,
     },
+    { id: "lists", label: "Lists", hint: "Bulleted or numbered items" },
   ];
 
 const QUICK_VALUES: Record<GenerationMode, number[]> = {
@@ -65,6 +70,7 @@ const QUICK_VALUES: Record<GenerationMode, number[]> = {
   sentences: [5, 10, 25, 50],
   words: [25, 50, 100, 250, 500],
   characters: [80, 160, 280, 500, 1000],
+  lists: [3, 5, 8, 12],
 };
 
 function createInitialDocument(): GeneratedDocument {
@@ -73,7 +79,7 @@ function createInitialDocument(): GeneratedDocument {
     quantity: 3,
     paragraphLength: "medium",
     classicOpening: true,
-    randomInt: createCryptoRandomInt(),
+    seed: 1,
   });
 }
 
@@ -89,7 +95,15 @@ export function LoremIpsumApp() {
   const [format, setFormat] = useState<OutputFormat>("plain");
   const [htmlMode, setHtmlMode] = useState<HtmlExportMode>("clean");
   const [outputView, setOutputView] = useState<OutputView>("source");
-  const [document, setDocument] = useState<GeneratedDocument | null>(null);
+  const [document, setDocument] = useState<GeneratedDocument | null>(
+    createInitialDocument,
+  );
+  const [listStyle, setListStyle] = useState<ListStyle>("unordered");
+  const [listItemLength, setListItemLength] = useState<ListItemLength>("medium");
+  const [seedInput, setSeedInput] = useState("");
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+  const [manualCopy, setManualCopy] = useState<string | null>(null);
+  const manualCopyRef = useRef<HTMLTextAreaElement>(null);
   const [outputExpanded, setOutputExpanded] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewLayout, setPreviewLayout] = useState<PreviewLayout>("article");
@@ -103,8 +117,39 @@ export function LoremIpsumApp() {
   } | null>(null);
 
   useEffect(() => {
-    setDocument(createInitialDocument());
+    const parsed = parseLoremSearch(window.location.search);
+    if (!parsed) return;
+    setMode(parsed.mode);
+    setQuantity(parsed.quantity);
+    setParagraphLength(parsed.paragraphLength);
+    setListStyle(parsed.listStyle);
+    setListItemLength(parsed.listItemLength);
+    setClassicOpening(parsed.classicOpening);
+    setPreferCompleteWords(parsed.preferCompleteWords);
+    setTextKind(parsed.textKind);
+    setFormat(parsed.format);
+    setSeedInput(parsed.seed === null ? "" : String(parsed.seed));
+    setDocument(
+      generateLorem({
+        mode: parsed.mode,
+        quantity: parsed.quantity,
+        paragraphLength: parsed.paragraphLength,
+        listStyle: parsed.listStyle,
+        listItemLength: parsed.listItemLength,
+        classicOpening: parsed.classicOpening,
+        preferCompleteWords: parsed.preferCompleteWords,
+        textKind: parsed.textKind,
+        seed: parsed.seed ?? undefined,
+        randomInt: parsed.seed === null ? createCryptoRandomInt() : undefined,
+      }),
+    );
   }, []);
+
+  useEffect(() => {
+    if (!manualCopy) return;
+    manualCopyRef.current?.focus();
+    manualCopyRef.current?.select();
+  }, [manualCopy]);
 
   const limits = QUANTITY_LIMITS[mode];
 
@@ -115,7 +160,7 @@ export function LoremIpsumApp() {
   );
 
   const plainForStats = useMemo(
-    () => (document ? serializeDocument(document, "plain") : ""),
+    () => (document ? documentStatsText(document) : ""),
     [document],
   );
 
@@ -143,21 +188,26 @@ export function LoremIpsumApp() {
     };
   }, [plainForStats]);
 
-  const htmlBody = useMemo(
-    () => (document ? documentToHtmlBody(document) : ""),
-    [document],
-  );
-  const mdSource = useMemo(
-    () => (document ? documentToMarkdown(document) : ""),
-    [document],
-  );
-
   function showFeedback(
     message: string,
     tone: "success" | "error" | "neutral" = "neutral",
   ) {
     setFeedback({ message, tone });
   }
+
+  function readSeed(): number | undefined {
+    if (seedInput.trim() === "") return undefined;
+    const value = Number(seedInput);
+    if (!Number.isInteger(value) || value < 0 || value > 2147483647) return undefined;
+    return value;
+  }
+
+  const seedValid =
+    seedInput.trim() === "" || readSeed() !== undefined;
+  const quantityValid =
+    Number.isInteger(quantity) &&
+    quantity >= limits.min &&
+    quantity <= limits.max;
 
   function runGenerate(overrides?: {
     mode?: GenerationMode;
@@ -169,10 +219,12 @@ export function LoremIpsumApp() {
   }) {
     const nextMode = overrides?.mode ?? mode;
     const nextQty = overrides?.quantity ?? quantity;
+    const nextLimits = QUANTITY_LIMITS[nextMode];
     const clamped = Math.min(
-      QUANTITY_LIMITS[nextMode].max,
-      Math.max(QUANTITY_LIMITS[nextMode].min, Math.floor(nextQty) || 1),
+      nextLimits.max,
+      Math.max(nextLimits.min, Math.floor(nextQty) || nextLimits.min),
     );
+    const seed = readSeed();
     const doc = generateLorem({
       mode: nextMode,
       quantity: clamped,
@@ -181,9 +233,13 @@ export function LoremIpsumApp() {
       textKind: overrides?.textKind ?? textKind,
       preferCompleteWords:
         overrides?.preferCompleteWords ?? preferCompleteWords,
-      randomInt: createCryptoRandomInt(),
+      listStyle,
+      listItemLength,
+      seed,
+      randomInt: seed === undefined ? createCryptoRandomInt() : undefined,
     });
     setDocument(doc);
+    setManualCopy(null);
     if (overrides?.textKind) setTextKind(overrides.textKind);
     showFeedback("Placeholder text generated", "success");
   }
@@ -199,20 +255,57 @@ export function LoremIpsumApp() {
     setClassicOpening(Boolean(opts.classicOpening));
     setPreferCompleteWords(Boolean(opts.preferCompleteWords));
     setTextKind(nextKind);
+    setActivePreset(id);
+    const seed = readSeed();
     const doc = generateLorem({
       ...opts,
       textKind: nextKind,
-      randomInt: createCryptoRandomInt(),
+      seed,
+      randomInt: seed === undefined ? createCryptoRandomInt() : undefined,
     });
     setDocument(doc);
+    setManualCopy(null);
     showFeedback(`Preset: ${preset.label}`, "success");
   }
 
   function handleModeChange(next: GenerationMode) {
     setMode(next);
-    setQuantity(QUANTITY_LIMITS[next].default);
-    // Mode changes from controls assume Lorem unless a UI preset is reapplied
+    setActivePreset(null);
     setTextKind("lorem");
+    setQuantity((current) => {
+      const nextLimits = QUANTITY_LIMITS[next];
+      if (!Number.isInteger(current)) return nextLimits.default;
+      return Math.min(nextLimits.max, Math.max(nextLimits.min, current));
+    });
+  }
+
+  async function copySettingsLink() {
+    const seed = readSeed() ?? null;
+    const query = buildLoremSearch({
+      mode,
+      quantity: quantityValid ? quantity : limits.default,
+      paragraphLength,
+      listStyle,
+      listItemLength,
+      classicOpening,
+      preferCompleteWords,
+      textKind,
+      format,
+      seed,
+    });
+    const url = `${window.location.origin}/lorem-ipsum-generator?${query}`;
+    window.history.replaceState(null, "", `${window.location.pathname}?${query}`);
+    const ok = await copyTextToClipboard(url);
+    if (ok) {
+      setManualCopy(null);
+      showFeedback("Settings link copied", "success");
+    } else {
+      setManualCopy(url);
+      showFeedback(
+        "Automatic copy was blocked. The settings link is selected below.",
+        "error",
+      );
+    }
   }
 
   function handleClear() {
@@ -238,8 +331,14 @@ export function LoremIpsumApp() {
                 key={preset.id}
                 type="button"
                 title={preset.description}
+                aria-pressed={activePreset === preset.id}
                 onClick={() => applyPreset(preset.id)}
-                className="rounded-control border border-line bg-surface px-3 py-2 text-sm font-semibold text-ink-muted shadow-soft transition-colors hover:border-accent/40 hover:text-accent"
+                className={cn(
+                  "min-h-11 rounded-control border px-3 py-2 text-left text-sm font-semibold shadow-soft transition-colors",
+                  activePreset === preset.id
+                    ? "border-accent bg-accent-soft text-accent"
+                    : "border-line bg-surface text-ink-muted hover:border-accent/40 hover:text-accent",
+                )}
               >
                 {preset.label}
               </button>
@@ -256,8 +355,14 @@ export function LoremIpsumApp() {
                 key={preset.id}
                 type="button"
                 title={preset.description}
+                aria-pressed={activePreset === preset.id}
                 onClick={() => applyPreset(preset.id)}
-                className="rounded-control border border-line bg-paper px-3 py-2 text-sm font-semibold text-ink-muted transition-colors hover:border-accent/40 hover:text-accent"
+                className={cn(
+                  "min-h-11 rounded-control border px-3 py-2 text-left text-sm font-semibold transition-colors",
+                  activePreset === preset.id
+                    ? "border-accent bg-accent-soft text-accent"
+                    : "border-line bg-paper text-ink-muted hover:border-accent/40 hover:text-accent",
+                )}
               >
                 {preset.label}
               </button>
@@ -319,13 +424,19 @@ export function LoremIpsumApp() {
               Quantity ({limits.min}–{limits.max.toLocaleString("en-US")})
             </label>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <input
+                <input
                 id={quantityId}
                 type="number"
+                inputMode="numeric"
                 min={limits.min}
                 max={limits.max}
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
+                value={Number.isFinite(quantity) ? quantity : ""}
+                aria-invalid={!quantityValid}
+                onChange={(event) => {
+                  setActivePreset(null);
+                  const raw = event.target.value;
+                  setQuantity(raw.trim() === "" ? Number.NaN : Number(raw));
+                }}
                 className="h-11 w-28 rounded-control border border-line bg-paper px-3 text-sm outline-none focus:border-accent"
               />
               <div className="flex flex-wrap gap-1.5">
@@ -333,7 +444,10 @@ export function LoremIpsumApp() {
                   <button
                     key={n}
                     type="button"
-                    onClick={() => setQuantity(n)}
+                    onClick={() => {
+                      setActivePreset(null);
+                      setQuantity(n);
+                    }}
                     className={cn(
                       "h-9 min-w-9 rounded-control border px-2.5 text-sm font-semibold",
                       quantity === n
@@ -346,6 +460,12 @@ export function LoremIpsumApp() {
                 ))}
               </div>
             </div>
+            {quantityValid ? null : (
+              <p className="mt-2 text-sm text-danger" role="alert">
+                Enter a whole number from {limits.min.toLocaleString("en-US")} to{" "}
+                {limits.max.toLocaleString("en-US")}.
+              </p>
+            )}
           </div>
 
           {mode === "paragraphs" ? (
@@ -392,6 +512,72 @@ export function LoremIpsumApp() {
             </div>
           ) : null}
 
+          {mode === "lists" ? (
+            <div className="mt-5 space-y-4">
+              <div>
+                <p className="text-sm font-semibold text-ink">List type</p>
+                <div role="radiogroup" aria-label="List type" className="mt-2 flex gap-2">
+                  {(
+                    [
+                      ["unordered", "Bulleted"],
+                      ["ordered", "Numbered"],
+                    ] as const
+                  ).map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      role="radio"
+                      aria-checked={listStyle === id}
+                      onClick={() => {
+                        setActivePreset(null);
+                        setListStyle(id);
+                      }}
+                      className={cn(
+                        "min-h-11 rounded-control border px-3 text-sm font-semibold",
+                        listStyle === id
+                          ? "border-accent bg-accent-soft text-accent"
+                          : "border-line bg-paper text-ink-muted",
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-ink">Item length</p>
+                <div role="radiogroup" aria-label="List item length" className="mt-2 grid grid-cols-3 gap-2">
+                  {(
+                    [
+                      ["short", "Short"],
+                      ["medium", "Medium"],
+                      ["long", "Long"],
+                    ] as const
+                  ).map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      role="radio"
+                      aria-checked={listItemLength === id}
+                      onClick={() => {
+                        setActivePreset(null);
+                        setListItemLength(id);
+                      }}
+                      className={cn(
+                        "min-h-11 rounded-control border px-2 text-sm font-semibold",
+                        listItemLength === id
+                          ? "border-accent bg-accent-soft text-accent"
+                          : "border-line bg-paper text-ink-muted",
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           {mode === "characters" ? (
             <div className="mt-5 space-y-2">
               <p className="text-xs text-ink-soft">{CHARACTER_METRIC_LABEL}</p>
@@ -430,8 +616,39 @@ export function LoremIpsumApp() {
             </p>
           )}
 
+          <div className="mt-5">
+            <label htmlFor={`${quantityId}-seed`} className="text-sm font-semibold text-ink">
+              Seed <span className="font-normal text-ink-soft">(optional)</span>
+            </label>
+            <input
+              id={`${quantityId}-seed`}
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={2147483647}
+              value={seedInput}
+              placeholder="Random"
+              aria-invalid={!seedValid}
+              onChange={(event) => {
+                setActivePreset(null);
+                setSeedInput(event.target.value);
+              }}
+              className="mt-2 h-11 w-full rounded-control border border-line bg-paper px-3 text-sm outline-none focus:border-accent"
+            />
+            <p className="mt-1 text-xs text-ink-soft">
+              {seedValid
+                ? "The same seed and settings always produce the same text. Leave blank for a new result each time."
+                : "Use a whole number from 0 to 2,147,483,647, or leave the seed blank."}
+            </p>
+          </div>
+
           <div className="mt-6 flex flex-wrap gap-2">
-            <Button type="button" size="lg" onClick={() => runGenerate()}>
+            <Button
+              type="button"
+              size="lg"
+              onClick={() => runGenerate()}
+              disabled={!quantityValid || !seedValid}
+            >
               Generate
             </Button>
             <Button
@@ -439,7 +656,7 @@ export function LoremIpsumApp() {
               variant="secondary"
               size="lg"
               onClick={() => runGenerate()}
-              disabled={!document}
+              disabled={!document || !quantityValid || !seedValid}
             >
               Regenerate
             </Button>
@@ -477,18 +694,31 @@ export function LoremIpsumApp() {
                 text={outputText}
                 disabled={!outputText}
                 label="Copy all"
-                onFeedback={(message, tone) =>
-                  showFeedback(message, tone ?? "neutral")
-                }
+                onFailed={() => setManualCopy(outputText)}
+                onFeedback={(message, tone) => {
+                  if (tone !== "error") setManualCopy(null);
+                  showFeedback(message, tone ?? "neutral");
+                }}
               />
               <DownloadButton
                 text={outputText}
                 filename={downloadFilenameFor(format)}
+                label={
+                  format === "html"
+                    ? "Download HTML"
+                    : format === "markdown"
+                      ? "Download MD"
+                      : "Download TXT"
+                }
+                mimeType={mimeTypeFor(format)}
                 disabled={!outputText}
                 onFeedback={(message, tone) =>
                   showFeedback(message, tone ?? "neutral")
                 }
               />
+              <Button type="button" variant="ghost" size="sm" className="min-h-11" onClick={copySettingsLink}>
+                Copy link
+              </Button>
             </div>
           </div>
 
@@ -525,7 +755,7 @@ export function LoremIpsumApp() {
                     setOutputView("source");
                   }}
                   className={cn(
-                    "rounded-[0.55rem] px-3 py-1.5 text-sm font-semibold",
+                    "min-h-11 rounded-[0.55rem] px-3 text-sm font-semibold",
                     format === id
                       ? "bg-accent text-accent-foreground"
                       : "text-ink-muted hover:text-ink",
@@ -617,27 +847,61 @@ export function LoremIpsumApp() {
             {document?.textKind === "ui-english"
               ? " · English UI copy (not Lorem Ipsum)"
               : ""}
+            {document?.mode === "lists"
+              ? ` · ${document.paragraphs.length} list items`
+              : ""}
+          </p>
+          <p className="mt-1 text-xs text-ink-soft">
+            Counts describe the placeholder text. HTML and Markdown markup are not included.
           </p>
 
-          {outputView === "rendered" && format === "html" ? (
+          {manualCopy ? (
+            <div className="mt-3">
+              <p id="lorem-manual-copy" role="status" className="text-sm text-danger">
+                Automatic copy was blocked. This text is selected so you can copy it yourself.
+              </p>
+              <textarea
+                ref={manualCopyRef}
+                readOnly
+                aria-labelledby="lorem-manual-copy"
+                value={manualCopy}
+                rows={4}
+                className="mt-2 w-full resize-y rounded-control border border-line bg-paper px-3 py-2 text-sm text-ink"
+              />
+            </div>
+          ) : null}
+
+          {outputView === "rendered" && format !== "plain" && document ? (
             <div
               className={cn(
-                "prose-wordmelo mt-3 overflow-auto rounded-[1.1rem] border border-line bg-mint/15 px-4 py-4",
-                outputExpanded ? "max-h-[40rem]" : "max-h-[22rem]",
-              )}
-              // Safe: body is app-generated escaped HTML from documentToHtmlBody
-              dangerouslySetInnerHTML={{ __html: htmlBody }}
-            />
-          ) : outputView === "rendered" && format === "markdown" ? (
-            <div
-              className={cn(
-                "mt-3 space-y-4 overflow-auto rounded-[1.1rem] border border-line bg-mint/15 px-4 py-4 font-sans text-base leading-7 text-ink",
+                "mt-3 overflow-auto rounded-[1.1rem] border border-line bg-mint/15 px-4 py-4 font-sans text-base leading-7 text-ink",
                 outputExpanded ? "max-h-[40rem]" : "max-h-[22rem]",
               )}
             >
-              {mdSource.split(/\n\n+/).map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">
+                Rendered preview
+              </p>
+              {document.mode === "lists" ? (
+                document.listStyle === "ordered" ? (
+                  <ol className="list-decimal space-y-2 pl-5">
+                    {document.paragraphs.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ol>
+                ) : (
+                  <ul className="list-disc space-y-2 pl-5">
+                    {document.paragraphs.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )
+              ) : (
+                document.paragraphs.map((paragraph, index) => (
+                  <p key={index} className="mb-4 last:mb-0">
+                    {paragraph}
+                  </p>
+                ))
+              )}
             </div>
           ) : (
             <pre
@@ -709,6 +973,23 @@ export function LoremIpsumApp() {
                   {PREVIEW_LAYOUTS[id].label}
                 </button>
               ))}
+            </div>
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="min-h-11"
+                onClick={() => {
+                  setPreviewLayout("article");
+                  setFontSize(17);
+                  setLineHeight(1.7);
+                  setParagraphGap(1.1);
+                  setAlign("left");
+                }}
+              >
+                Reset preview
+              </Button>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -795,16 +1076,36 @@ export function LoremIpsumApp() {
                   textAlign: align,
                 }}
               >
-                {(document?.paragraphs ?? []).map((p, i) => (
-                  <p
-                    key={i}
-                    style={{
-                      marginTop: i === 0 ? 0 : `${paragraphGap}em`,
-                    }}
-                  >
-                    {p}
-                  </p>
-                ))}
+                {document?.mode === "lists" ? (
+                  document.listStyle === "ordered" ? (
+                    <ol className="list-decimal pl-5">
+                      {document.paragraphs.map((item, index) => (
+                        <li key={index} style={{ marginTop: index === 0 ? 0 : `${paragraphGap}em` }}>
+                          {item}
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <ul className="list-disc pl-5">
+                      {document.paragraphs.map((item, index) => (
+                        <li key={index} style={{ marginTop: index === 0 ? 0 : `${paragraphGap}em` }}>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                ) : (
+                  (document?.paragraphs ?? []).map((p, i) => (
+                    <p
+                      key={i}
+                      style={{
+                        marginTop: i === 0 ? 0 : `${paragraphGap}em`,
+                      }}
+                    >
+                      {p}
+                    </p>
+                  ))
+                )}
                 {!document ? (
                   <p className="text-ink-soft">Generate text to preview.</p>
                 ) : null}

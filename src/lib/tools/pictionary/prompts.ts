@@ -2,7 +2,8 @@ import type { PictionaryPrompt } from "./types";
 
 /**
  * Curated Pictionary drawing prompts.
- * Policy: non-living subjects only — see CONTENT_POLICY.md
+ * Policy: objects, plants, places, and nature — no people or animals.
+ * See CONTENT_POLICY.md
  */
 export const PICTIONARY_PROMPTS: readonly PictionaryPrompt[] = [
   { id: "p0001", text: "Apple", category: "fruits-vegetables", difficulty: "easy" },
@@ -103,7 +104,7 @@ export const PICTIONARY_PROMPTS: readonly PictionaryPrompt[] = [
   { id: "p0096", text: "Saguaro cactus", category: "plants", difficulty: "hard" },
   { id: "p0097", text: "Mangrove tree", category: "plants", difficulty: "hard" },
   { id: "p0098", text: "Sequoia trunk", category: "plants", difficulty: "hard" },
-  { id: "p0099", text: "Epiphyte orchid", category: "plants", difficulty: "hard" },
+  { id: "p0099", text: "Orchid on a branch", category: "plants", difficulty: "hard" },
   { id: "p0100", text: "Desert bloom", category: "plants", difficulty: "hard" },
   { id: "p0101", text: "Mountain", category: "landscapes", difficulty: "easy" },
   { id: "p0102", text: "River", category: "landscapes", difficulty: "easy" },
@@ -123,7 +124,7 @@ export const PICTIONARY_PROMPTS: readonly PictionaryPrompt[] = [
   { id: "p0116", text: "Canyon", category: "landscapes", difficulty: "medium" },
   { id: "p0117", text: "Glacier", category: "landscapes", difficulty: "medium" },
   { id: "p0118", text: "Sand dune", category: "landscapes", difficulty: "medium" },
-  { id: "p0119", text: "Coral reef", category: "landscapes", difficulty: "medium" },
+  { id: "p0119", text: "Sea stack", category: "landscapes", difficulty: "medium" },
   { id: "p0120", text: "Hot spring", category: "landscapes", difficulty: "medium" },
   { id: "p0121", text: "Geyser", category: "landscapes", difficulty: "medium" },
   { id: "p0122", text: "Fjord", category: "landscapes", difficulty: "medium" },
@@ -135,12 +136,12 @@ export const PICTIONARY_PROMPTS: readonly PictionaryPrompt[] = [
   { id: "p0128", text: "Rainbow over hills", category: "landscapes", difficulty: "medium" },
   { id: "p0129", text: "Snowy peak", category: "landscapes", difficulty: "medium" },
   { id: "p0130", text: "Rocky shoreline", category: "landscapes", difficulty: "medium" },
-  { id: "p0131", text: "Suspension of mist over canyon", category: "landscapes", difficulty: "hard" },
+  { id: "p0131", text: "Mist over a canyon", category: "landscapes", difficulty: "hard" },
   { id: "p0132", text: "Terraced rice fields", category: "landscapes", difficulty: "hard" },
   { id: "p0133", text: "Salt flat", category: "landscapes", difficulty: "hard" },
   { id: "p0134", text: "Caldera lake", category: "landscapes", difficulty: "hard" },
   { id: "p0135", text: "Karst mountains", category: "landscapes", difficulty: "hard" },
-  { id: "p0136", text: "Barrier reef", category: "landscapes", difficulty: "hard" },
+  { id: "p0136", text: "Coastal lagoon", category: "landscapes", difficulty: "hard" },
   { id: "p0137", text: "Iceberg floating", category: "landscapes", difficulty: "hard" },
   { id: "p0138", text: "Badlands formation", category: "landscapes", difficulty: "hard" },
   { id: "p0139", text: "Lava flow field", category: "landscapes", difficulty: "hard" },
@@ -224,7 +225,7 @@ export const PICTIONARY_PROMPTS: readonly PictionaryPrompt[] = [
   { id: "p0217", text: "Grandfather clock", category: "rooms-furniture", difficulty: "hard" },
   { id: "p0218", text: "Antique dresser", category: "rooms-furniture", difficulty: "hard" },
   { id: "p0219", text: "French doors", category: "rooms-furniture", difficulty: "hard" },
-  { id: "p0220", text: "Open-plan loft layout", category: "rooms-furniture", difficulty: "hard" },
+  { id: "p0220", text: "Loft railing", category: "rooms-furniture", difficulty: "hard" },
   { id: "p0221", text: "Car", category: "vehicles", difficulty: "easy" },
   { id: "p0222", text: "Bicycle", category: "vehicles", difficulty: "easy" },
   { id: "p0223", text: "Airplane", category: "vehicles", difficulty: "easy" },
@@ -255,7 +256,7 @@ export const PICTIONARY_PROMPTS: readonly PictionaryPrompt[] = [
   { id: "p0248", text: "Convertible car", category: "vehicles", difficulty: "medium" },
   { id: "p0249", text: "Jet plane", category: "vehicles", difficulty: "medium" },
   { id: "p0250", text: "Glider", category: "vehicles", difficulty: "medium" },
-  { id: "p0251", text: "Suspension bridge train", category: "vehicles", difficulty: "hard" },
+  { id: "p0251", text: "Train crossing a bridge", category: "vehicles", difficulty: "hard" },
   { id: "p0252", text: "Rocket launch pad", category: "vehicles", difficulty: "hard" },
   { id: "p0253", text: "Space shuttle", category: "vehicles", difficulty: "hard" },
   { id: "p0254", text: "Steam locomotive", category: "vehicles", difficulty: "hard" },
@@ -506,10 +507,3 @@ export const PICTIONARY_PROMPTS: readonly PictionaryPrompt[] = [
   { id: "p0499", text: "Post hole digger", category: "tools", difficulty: "hard" },
   { id: "p0500", text: "Pruning shears", category: "tools", difficulty: "hard" },
 ];
-
-export const PROMPT_STATS = {
-  total: 500,
-  easy: 195,
-  medium: 185,
-  hard: 120,
-} as const;

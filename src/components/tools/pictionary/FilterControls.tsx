@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { PROMPT_CATEGORIES, countEligible } from "@/lib/tools/pictionary";
+import { PROMPT_CATEGORIES, PROMPT_STATS, countEligible } from "@/lib/tools/pictionary";
 import type {
   DifficultyFilter,
   PromptCategoryId,
@@ -26,6 +26,10 @@ interface FilterControlsProps {
   idPrefix: string;
   usedIds?: ReadonlySet<string>;
   defaultCategoriesOpen?: boolean;
+  showDifficulty?: boolean;
+  showCategories?: boolean;
+  showNoRepeat?: boolean;
+  compactDifficulty?: boolean;
 }
 
 export function FilterControls({
@@ -34,6 +38,10 @@ export function FilterControls({
   idPrefix,
   usedIds,
   defaultCategoriesOpen = false,
+  showDifficulty = true,
+  showCategories = true,
+  showNoRepeat = true,
+  compactDifficulty = false,
 }: FilterControlsProps) {
   const [categoriesOpen, setCategoriesOpen] = useState(defaultCategoriesOpen);
   const eligible = countEligible(filters, filters.noRepeat ? usedIds : undefined);
@@ -59,9 +67,9 @@ export function FilterControls({
 
   return (
     <div className="space-y-4">
-      <fieldset>
+      {showDifficulty ? <fieldset>
         <legend className="text-sm font-semibold text-ink">Difficulty</legend>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className={compactDifficulty ? "mt-2 grid grid-cols-4 gap-1.5" : "mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4"}>
           {(Object.keys(DIFFICULTY_COPY) as DifficultyFilter[]).map((value) => {
             const meta = DIFFICULTY_COPY[value];
             const selected = filters.difficulty === value;
@@ -69,7 +77,8 @@ export function FilterControls({
               <label
                 key={value}
                 className={cn(
-                  "cursor-pointer rounded-[0.9rem] border px-3 py-2.5 text-left transition-colors",
+                  "min-h-11 cursor-pointer rounded-[0.9rem] border transition-colors",
+                  compactDifficulty ? "flex items-center justify-center px-1 py-2 text-center" : "px-3 py-2.5 text-left",
                   selected
                     ? "border-accent bg-accent-soft text-accent"
                     : "border-line bg-paper text-ink hover:border-line-strong",
@@ -82,7 +91,8 @@ export function FilterControls({
                   checked={selected}
                   onChange={() => onChange({ ...filters, difficulty: value })}
                 />
-                <span className="block text-sm font-semibold">{meta.label}</span>
+                <span className={cn("block font-semibold", compactDifficulty ? "text-xs sm:text-sm" : "text-sm")}>{meta.label}</span>
+                {compactDifficulty ? null : (
                 <span
                   className={cn(
                     "mt-0.5 block text-[0.7rem] leading-snug",
@@ -91,13 +101,14 @@ export function FilterControls({
                 >
                   {meta.blurb}
                 </span>
+                )}
               </label>
             );
           })}
         </div>
-      </fieldset>
+      </fieldset> : null}
 
-      <div>
+      {showCategories ? <div>
         <button
           type="button"
           className="flex w-full items-center justify-between rounded-control border border-line bg-paper px-3.5 py-3 text-left text-sm font-semibold text-ink hover:border-line-strong"
@@ -127,7 +138,7 @@ export function FilterControls({
           className="mt-2 rounded-[1rem] border border-line/80 bg-mint/15 p-3"
         >
           <p className="text-xs text-ink-soft">
-            Leave empty for every allowed category. No human or animal drawing subjects.
+            Leave empty for every category. Counts come from the curated list of objects, plants, places, and nature. People and animals are not included.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             <button
@@ -157,7 +168,7 @@ export function FilterControls({
                   aria-pressed={selected}
                   onClick={() => toggleCategory(cat.id)}
                   className={cn(
-                    "rounded-control border px-2.5 py-2 text-left text-xs font-medium sm:text-sm",
+                    "min-h-11 rounded-control border px-2.5 py-2 text-left text-xs font-medium sm:text-sm",
                     selected
                       ? "border-accent bg-accent text-accent-foreground"
                       : allMode
@@ -165,15 +176,18 @@ export function FilterControls({
                         : "border-line bg-paper text-ink-muted",
                   )}
                 >
-                  {cat.label}
+                  <span className="block">{cat.label}</span>
+                  <span className={cn("mt-0.5 block text-[0.7rem] font-normal", selected ? "text-accent-foreground/80" : "text-ink-soft")}>
+                    {PROMPT_STATS.byCategory[cat.id].total}
+                  </span>
                 </button>
               );
             })}
           </div>
         </div>
-      </div>
+      </div> : null}
 
-      <label className="flex items-start gap-3 rounded-control border border-line bg-paper px-3 py-3">
+      {showNoRepeat ? <label className="flex items-start gap-3 rounded-control border border-line bg-paper px-3 py-3">
         <input
           type="checkbox"
           className="mt-1 h-4 w-4 rounded border-line text-accent"
@@ -189,11 +203,13 @@ export function FilterControls({
             the eligible pool; used IDs stay excluded until you reset.
           </span>
         </span>
-      </label>
+      </label> : null}
 
+      {showDifficulty && !compactDifficulty ? (
       <p className="text-xs text-ink-soft" aria-live="polite">
         Eligible prompts now: <strong className="text-ink">{eligible.toLocaleString()}</strong>
       </p>
+      ) : null}
     </div>
   );
 }

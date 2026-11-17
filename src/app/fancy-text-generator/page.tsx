@@ -6,78 +6,53 @@ import { ToolFAQ } from "@/components/tools/ToolFAQ";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import { ToolShell } from "@/components/tools/ToolShell";
 import { absoluteUrl, createPageMetadata } from "@/lib/seo";
+import { getFancyStyleById, getFancyStyleCount } from "@/lib/tools/fancy-text";
 import {
-  getFancyStyleById,
-  getFancyStyleCount,
-} from "@/lib/tools/fancy-text";
+  FANCY_DESCRIPTION,
+  FANCY_FAQS,
+  FANCY_H1,
+  FANCY_INTRO,
+  FANCY_PATH,
+  FANCY_TITLE,
+} from "@/lib/tools/fancy-text/page-copy";
 
 export const metadata = createPageMetadata({
-  title: "Fancy Text Generator — Copy & Paste Fonts | WordMelo",
-  description:
-    "Generate fancy text and stylish Unicode fonts for Instagram, TikTok, Discord and more. Explore free copy-and-paste styles instantly with WordMelo.",
-  path: "/fancy-text-generator",
+  title: FANCY_TITLE,
+  description: FANCY_DESCRIPTION,
+  path: FANCY_PATH,
   keywords: [
     "fancy text generator",
     "fancy font generator",
-    "fancy text copy and paste",
-    "stylish text generator",
     "fancy fonts copy and paste",
+    "copy and paste fonts",
     "cool text generator",
+    "stylish text generator",
+    "aesthetic fonts",
     "unicode text generator",
-    "aesthetic text generator",
-    "fancy letters generator",
     "instagram fonts",
-    "tiktok fonts",
-    "discord fonts",
-    "fancy names",
+    "fancy text for instagram",
+    "stylish name generator",
   ],
 });
 
-const EXAMPLE_PLAIN = "Hello World";
+const EXAMPLE_PLAIN = "Hello";
 
 function example(styleId: string): string {
   return getFancyStyleById(styleId)?.transform(EXAMPLE_PLAIN) ?? EXAMPLE_PLAIN;
 }
 
-const faqItems = [
-  {
-    question: "Is this a real font installer?",
-    answer:
-      "No. WordMelo creates Unicode character sequences that look stylish in many apps. It does not install font files. What you copy is text made of special symbols, not a TrueType or OpenType font.",
-  },
-  {
-    question: "Will fancy text work on Instagram, TikTok, and Discord?",
-    answer:
-      "Many mathematical letter styles, fullwidth text, and decorative frames paste into Instagram bios, TikTok names, and Discord nicknames. Support depends on each app’s font coverage — always preview after pasting.",
-  },
-  {
-    question: "Why do some letters stay plain?",
-    answer:
-      "Most letter styles map basic Latin letters and digits only. Punctuation, emoji, and non-Latin scripts stay unchanged so text is not deleted. Combining styles attach marks to remappable characters.",
-  },
-  {
-    question: "Can I convert fancy text back to normal letters?",
-    answer:
-      "Yes, with limits. Open Fancy text → plain text on this page to reverse supported mathematical, fullwidth, circled, and similar mappings. Upside-down order, unknown symbols, and many decorations are not fully reversible.",
-  },
-  {
-    question: "Is my text uploaded to WordMelo?",
-    answer:
-      "No. Generation runs in your browser. Favorites and recently copied style IDs stay in local storage on this device — your typed text is not sent for styling.",
-  },
-  {
-    question: "Are fancy Unicode styles accessible?",
-    answer:
-      "Decorative Unicode can be hard for screen readers to announce clearly. Prefer plain text for important information. Treat fancy letters as accents for names and short social labels.",
-  },
-];
-
 export default function FancyTextGeneratorPage() {
   const styleCount = getFancyStyleCount();
-  const boldExample = example("bold-sans");
-  const scriptExample = example("script");
-  const gothicExample = example("fraktur");
-  const circledExample = example("circled");
+  const rows = [
+    ["Bold", example("bold-sans")],
+    ["Italic", example("italic")],
+    ["Script", example("script")],
+    ["Gothic", example("fraktur")],
+    ["Double-struck", example("double-struck")],
+    ["Circled", example("circled")],
+    ["Fullwidth", example("fullwidth")],
+    ["Small caps", example("small-caps")],
+  ];
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -93,7 +68,7 @@ export default function FancyTextGeneratorPage() {
         "@type": "ListItem",
         position: 2,
         name: "Fancy Text Generator",
-        item: absoluteUrl("/fancy-text-generator"),
+        item: absoluteUrl(FANCY_PATH),
       },
     ],
   };
@@ -102,17 +77,17 @@ export default function FancyTextGeneratorPage() {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "WordMelo Fancy Text Generator",
-    url: absoluteUrl("/fancy-text-generator"),
+    url: absoluteUrl(FANCY_PATH),
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any",
     browserRequirements: "Requires a modern browser with JavaScript enabled.",
+    isAccessibleForFree: true,
     offers: {
       "@type": "Offer",
       price: "0",
       priceCurrency: "USD",
     },
-    description:
-      "Generate fancy Unicode text styles for copy and paste into social apps. Runs locally in the browser.",
+    description: FANCY_DESCRIPTION,
   };
 
   return (
@@ -126,9 +101,9 @@ export default function FancyTextGeneratorPage() {
         className="pt-6 sm:pt-8"
       >
         <ToolHeader
-          title="Fancy Text Generator — Copy & Paste Stylish Fonts"
-          description="Create stylish Unicode fonts for bios, fancy names, and captions. Copy and paste into Instagram, TikTok, Discord, and other apps that accept special characters."
-          privacyNote="Runs locally in your browser — text is not uploaded."
+          title={FANCY_H1}
+          description={FANCY_INTRO}
+          privacyNote="Runs in your browser. Typed text is not uploaded."
         />
 
         <FancyTextGeneratorApp />
@@ -136,137 +111,108 @@ export default function FancyTextGeneratorPage() {
         <div className="ad-region" aria-hidden="true" />
 
         <section
-          aria-labelledby="fancy-text-guide"
+          aria-labelledby="fancy-platforms"
           className="overflow-hidden rounded-[1.15rem] border border-line bg-surface"
         >
-          <div className="border-b border-line bg-mint/40 px-5 py-4 sm:px-8 sm:py-5">
-            <h2
-              id="fancy-text-guide"
-              className="font-display text-2xl font-semibold text-ink sm:text-[1.75rem]"
-            >
-              Fancy text guide
+          <div className="prose-wordmelo max-w-none px-5 py-6 sm:px-8 sm:py-8">
+            <h2 id="fancy-platforms" className="!mt-0">
+              Fancy Text for Instagram, TikTok, and Discord
             </h2>
-            <p className="mt-1 text-sm text-ink-muted sm:text-base">
-              Short answers for how this unicode text generator works — and when
-              not to use it.
-            </p>
-          </div>
-
-          <div className="prose-wordmelo max-w-none space-y-0 px-5 py-6 sm:px-8 sm:py-8">
-            <h2 className="!mt-0">What is a Fancy Text Generator?</h2>
             <p>
-              A fancy text generator (or fancy font generator) turns plain letters
-              into Unicode symbols that look bold, script, gothic, circled, or
-              otherwise decorative. You copy the result and paste it where the
-              app accepts Unicode — bios, usernames, and short captions.
+              People usually want a short bio, display name, or nickname, not a
+              restyled article. Mathematical bold and script styles are the most
+              common choices for an Instagram bio or a TikTok name. Gothic and
+              double-struck styles are a better fit for a Discord nickname or a
+              gaming tag. Paste the result, then look at it on the device you
+              will actually publish from.
+            </p>
+            <p>
+              WordMelo is not affiliated with those apps. A style that looks
+              right here can still be rejected by a username field, trimmed by a
+              character limit, or drawn as an empty box. Keep a plain copy of
+              the name.
             </p>
 
-            <h2>How to generate fancy text</h2>
-            <ol>
-              <li>Type a name, bio line, or caption in Style studio.</li>
-              <li>Browse featured styles or filter by category / search.</li>
-              <li>Press Copy on a card, then paste into your app.</li>
-              <li>Optional: heart favorites or open decorative symbols.</li>
-            </ol>
-
-            <h2>Popular Unicode text styles</h2>
+            <h2>Popular Unicode Text Styles</h2>
             <p>
-              WordMelo ships {styleCount} distinct transformations. Examples for
-              “{EXAMPLE_PLAIN}” using this page’s real mappings:
+              The tool above includes {styleCount} styles. Here is “{EXAMPLE_PLAIN}” in a few of them:
             </p>
             <div className="not-prose my-5 overflow-x-auto rounded-control border border-line">
-              <table className="w-full min-w-[28rem] text-left text-sm">
+              <table className="w-full min-w-[20rem] text-left text-sm">
                 <thead className="bg-mint/50 text-ink">
                   <tr>
                     <th className="px-3 py-2.5 font-semibold">Style</th>
-                    <th className="px-3 py-2.5 font-semibold">Preview</th>
+                    <th className="px-3 py-2.5 font-semibold">Example</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-line text-ink-muted">
-                  <tr>
-                    <td className="px-3 py-2.5 text-ink">Plain</td>
-                    <td className="px-3 py-2.5 font-serif text-base text-ink">
-                      {EXAMPLE_PLAIN}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2.5 text-ink">Bold sans</td>
-                    <td className="px-3 py-2.5 font-serif text-base text-ink">
-                      {boldExample}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2.5 text-ink">Script</td>
-                    <td className="px-3 py-2.5 font-serif text-base text-ink">
-                      {scriptExample}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2.5 text-ink">Gothic</td>
-                    <td className="px-3 py-2.5 font-serif text-base text-ink">
-                      {gothicExample}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2.5 text-ink">Circled</td>
-                    <td className="px-3 py-2.5 font-serif text-base text-ink">
-                      {circledExample}
-                    </td>
-                  </tr>
+                <tbody className="divide-y divide-line text-ink">
+                  {rows.map(([label, value]) => (
+                    <tr key={label}>
+                      <td className="px-3 py-2.5">{label}</td>
+                      <td className="px-3 py-2.5 text-base">{value}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
 
-            <h2>Fancy text versus actual fonts</h2>
+            <h2>How to Use the Fancy Text Generator</h2>
+            <ol>
+              <li>Type a name, bio, or caption, or load the Demo, Name, Bio, or Caption example.</li>
+              <li>Browse with search or a category. Favorites and recently copied styles stay on this device.</li>
+              <li>Press Copy on the card you want. If the clipboard is blocked, the exact characters are selected for a manual copy.</li>
+              <li>Paste into the app. Use the profile preview when you want a rough length check, and the name builder when you want a star or bracket around the first line.</li>
+            </ol>
             <p>
-              Installed fonts redraw the same A–Z code points. Fancy Unicode
-              substitutes different characters that merely look similar. That
-              makes a stylish text generator ideal for short social labels and a
-              poor fit for long articles, searchable documents, or SEO body copy.
+              Need the letters in a normal case first? Use the{" "}
+              <Link href="/case-converter">Case Converter</Link> or the{" "}
+              <Link href="/title-case-converter">Title Case Converter</Link>,
+              then come back. The{" "}
+              <Link href="/character-counter">Character Counter</Link> is useful
+              when a bio has a hard limit. For handwriting you can download as a
+              picture, use the{" "}
+              <Link href="/cursive-generator">Cursive Generator</Link>.
             </p>
 
-            <h2>Fancy text for Instagram, TikTok and Discord</h2>
+            <h2>Fancy Text vs Regular Fonts</h2>
             <p>
-              Instagram fonts and TikTok fonts usually mean short bio or display
-              name lines. Discord fonts often mean nicknames or status text.
-              Keep a plain backup — some communities and bots restrict unusual
-              characters, and glyph support varies by device.
+              A font changes how the same letter is drawn. This generator
+              changes which letter you are copying. A bold style does not apply
+              CSS bold to “A”; it copies a different Unicode character that
+              looks bold. That is why you do not install anything, and why a
+              search engine, a spreadsheet, or a screen reader may treat the
+              word as unfamiliar symbols rather than the original word.
+            </p>
+            <p>
+              Use fancy text for short labels. Leave articles, addresses, and
+              anything someone must search or hear in plain text.
             </p>
 
-            <h2>How to choose readable fancy text</h2>
+            <h2>Where Fancy Text May Not Work</h2>
             <ul>
-              <li>Prefer bold or sans styles for names people must recognize.</li>
-              <li>Reserve script and gothic looks for short flourishes.</li>
-              <li>Avoid styling an entire caption in mathematical letters.</li>
-              <li>
-                Normalize casing first with the{" "}
-                <Link href="/case-converter">Case Converter</Link>, then pair
-                with the <Link href="/word-counter">Word Counter</Link> if
-                character limits matter.
-              </li>
-              <li>
-                For focused cursive handwriting fonts and PNG export, use the{" "}
-                <Link href="/cursive-generator">Cursive Generator</Link> instead
-                of browsing every Fancy Text style.
-              </li>
-              <li>
-                Need prompt words first? Try the{" "}
-                <Link href="/random-word-generator">Random Word Generator</Link>.
-              </li>
+              <li>Letters outside basic Latin, including Arabic and Urdu, stay as you typed them. The styles do not invent a styled form for every writing system.</li>
+              <li>Emoji, spaces, and line breaks are kept. Punctuation is styled only when that style has a mapping.</li>
+              <li>Combining styles such as underline attach a mark to Latin letters and digits. They can look uneven, and some apps strip the mark.</li>
+              <li>Upside-down text and extra spacing are visual effects. The plain-text converter does not promise to undo them.</li>
+              <li>Missing glyphs show up as boxes. Username fields, email, and many games reject the characters entirely.</li>
+              <li>Screen readers may spell the characters one by one or skip them. Do not rely on fancy text for instructions.</li>
             </ul>
-
-            <h2>Unicode compatibility</h2>
-            <p>
-              Missing glyphs can show as boxes. Unsupported scripts stay plain by
-              design. WordMelo does not claim universal platform or language
-              coverage — preview on the device where you will publish.
-            </p>
           </div>
         </section>
 
-        <ToolFAQ title="Frequently asked questions" items={faqItems} />
+        <ToolFAQ title="Frequently Asked Questions" items={[...FANCY_FAQS]} />
 
-        <RelatedTools currentToolId="fancy-text-generator" />
+        <RelatedTools
+          currentToolId="fancy-text-generator"
+          preferredIds={[
+            "word-counter",
+            "character-counter",
+            "case-converter",
+            "title-case-converter",
+            "cursive-generator",
+          ]}
+          limit={5}
+        />
       </ToolShell>
     </>
   );

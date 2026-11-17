@@ -141,7 +141,7 @@ export const tools: ToolDefinition[] = [
     status: "published",
     categoryId: "formatting",
     summary:
-      "Generate stylish Unicode fonts to copy and paste for bios, names, and captions.",
+      "Generate 42 Unicode text styles to copy and paste for bios, names, and captions.",
     description:
       "Transform plain text into bold, script, gothic, circled, and decorative Unicode styles for Instagram, TikTok, Discord, and more — processed locally in your browser.",
     keywords: [
@@ -222,9 +222,9 @@ export const tools: ToolDefinition[] = [
     status: "published",
     categoryId: "generation",
     summary:
-      "Curated drawing prompts with timer, categories, and local team scoring.",
+      "Drawing prompts with categories, a team timer, word lists, and printable cards.",
     description:
-      "Generate family-friendly Pictionary drawing prompts or play a timed team game with secret prompts and scores — all processed locally in your browser.",
+      "Generate family-friendly Pictionary drawing prompts, play a timed team game, or print word cards — all processed locally in your browser.",
     keywords: [
       "pictionary word generator",
       "random pictionary word generator",
@@ -272,7 +272,7 @@ export const tools: ToolDefinition[] = [
     summary:
       "Generate Lorem Ipsum placeholder text for mockups, websites, and UI prototypes.",
     description:
-      "Create classic or random Lorem Ipsum as paragraphs, sentences, words, or exact character lengths. Copy or download plain text, HTML, or Markdown — all processed locally in your browser.",
+      "Create classic or random Lorem Ipsum as paragraphs, sentences, words, lists, or exact character lengths. Copy or download plain text, HTML, or Markdown — all processed locally in your browser.",
     keywords: [
       "lorem ipsum generator",
       "lorem ipsum",

@@ -15,18 +15,12 @@ const file = `import type { PictionaryPrompt } from "./types";
 
 /**
  * Curated Pictionary drawing prompts.
- * Policy: non-living subjects only — see CONTENT_POLICY.md
+ * Policy: objects, plants, places, and nature — no people or animals.
+ * See CONTENT_POLICY.md. Difficulty counts live in stats.ts.
  */
 export const PICTIONARY_PROMPTS: readonly PictionaryPrompt[] = [
 ${rows}
 ];
-
-export const PROMPT_STATS = {
-  total: ${data.length},
-  easy: ${data.filter((p) => p.difficulty === "easy").length},
-  medium: ${data.filter((p) => p.difficulty === "medium").length},
-  hard: ${data.filter((p) => p.difficulty === "hard").length},
-} as const;
 `;
 
 fs.writeFileSync("src/lib/tools/pictionary/prompts.ts", file);

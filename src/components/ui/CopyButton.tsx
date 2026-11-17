@@ -10,6 +10,7 @@ interface CopyButtonProps {
   label?: string;
   disabled?: boolean;
   onFeedback?: (message: string, tone?: "success" | "error") => void;
+  onFailed?: () => void;
 }
 
 export function CopyButton({
@@ -17,6 +18,7 @@ export function CopyButton({
   label = "Copy",
   disabled,
   onFeedback,
+  onFailed,
 }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
@@ -28,6 +30,7 @@ export function CopyButton({
       window.setTimeout(() => setCopied(false), 2000);
     } else {
       onFeedback?.("Could not copy text", "error");
+      onFailed?.();
     }
   }
 

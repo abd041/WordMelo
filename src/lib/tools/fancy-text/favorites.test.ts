@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   pushRecentCopiedStyleId,
+  sanitizeStyleIds,
   toggleFavoriteStyleId,
 } from "./favorites";
 
@@ -11,6 +12,21 @@ describe("toggleFavoriteStyleId", () => {
 
   it("removes an existing id", () => {
     expect(toggleFavoriteStyleId(["a", "b"], "a")).toEqual(["b"]);
+  });
+});
+
+describe("sanitizeStyleIds", () => {
+  it("drops unknown ids and duplicates and keeps order", () => {
+    expect(
+      sanitizeStyleIds(["script", "nope", "script", "bold-sans", ""]),
+    ).toEqual(["script", "bold-sans"]);
+  });
+
+  it("caps the list", () => {
+    expect(sanitizeStyleIds(["script", "bold-sans", "italic"], 2)).toEqual([
+      "script",
+      "bold-sans",
+    ]);
   });
 });
 

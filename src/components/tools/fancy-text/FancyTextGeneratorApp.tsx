@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { FancyTextDecorations } from "@/components/tools/fancy-text/FancyTextDecorations";
+import { FancyTextPreview } from "@/components/tools/fancy-text/FancyTextPreview";
 import { FancyTextReversePanel } from "@/components/tools/fancy-text/FancyTextReversePanel";
 import { Button } from "@/components/ui/Button";
 import { FeedbackMessage } from "@/components/ui/FeedbackMessage";
@@ -25,9 +26,10 @@ import {
   FANCY_STYLES,
   FEATURED_STYLE_IDS,
   type FancySortMode,
-  type FancyStyleCategory,
+  filterFancyResults,
   generateAllFancyStyles,
   sortFancyResults,
+  type FancyCategoryFilter,
 } from "@/lib/tools/fancy-text";
 import {
   pushRecentCopiedStyleId,
@@ -54,7 +56,7 @@ const EXAMPLE_PRESETS = [
 
 const INITIAL_VISIBLE = FEATURED_STYLE_IDS.length;
 
-type CategoryFilter = "all" | "favorites" | "recent" | FancyStyleCategory;
+const MAX_COMPARE = 3;
 
 export function FancyTextGeneratorApp() {
   const editorId = useId();
@@ -63,20 +65,22 @@ export function FancyTextGeneratorApp() {
   const studioRef = useRef<HTMLElement>(null);
   const [text, setText] = useState(DEFAULT_SAMPLE);
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [category, setCategory] = useState<FancyCategoryFilter>("all");
   const [sortMode, setSortMode] = useState<FancySortMode>("featured");
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [recentCopied, setRecentCopied] = useState<string[]>([]);
   const [storageReady, setStorageReady] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [manualCopy, setManualCopy] = useState<string | null>(null);
+  const manualCopyRef = useRef<HTMLTextAreaElement>(null);
   const [feedback, setFeedback] = useState<{
     message: string;
     tone: "success" | "error" | "neutral";
   } | null>(null);
 
   const deferredText = useDeferredValue(text);
-  const deferredQuery = useDeferredValue(query);
 
   useEffect(() => {
     setFavorites(readFavoriteStyleIds());
@@ -96,30 +100,31 @@ export function FancyTextGeneratorApp() {
 
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE);
-  }, [deferredQuery, category, deferredText, sortMode]);
+  }, [query, category, sortMode]);
+
+  useEffect(() => {
+    if (!manualCopy) return;
+    const field = manualCopyRef.current;
+    if (!field) return;
+    field.focus();
+    field.select();
+  }, [manualCopy]);
 
   const results = useMemo(
     () => generateAllFancyStyles(deferredText),
     [deferredText],
   );
 
-  const filtered = useMemo(() => {
-    const q = deferredQuery.trim().toLowerCase();
-    return results.filter(({ style }) => {
-      if (category === "favorites") {
-        if (!favorites.includes(style.id)) return false;
-      } else if (category === "recent") {
-        if (!recentCopied.includes(style.id)) return false;
-      } else if (category !== "all" && style.category !== category) {
-        return false;
-      }
-      if (!q) return true;
-      const haystack = [style.name, style.description, ...style.keywords]
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(q);
-    });
-  }, [results, deferredQuery, category, favorites, recentCopied]);
+  const filtered = useMemo(
+    () =>
+      filterFancyResults(results, {
+        query,
+        category,
+        favoriteIds: favorites,
+        recentIds: recentCopied,
+      }),
+    [results, query, category, favorites, recentCopied],
+  );
 
   const ordered = useMemo(() => {
     let list = sortFancyResults(
@@ -154,6 +159,7 @@ export function FancyTextGeneratorApp() {
     }
     const ok = await copyTextToClipboard(output);
     if (ok) {
+      setManualCopy(null);
       setCopiedId(styleId);
       setRecentCopied((current) => pushRecentCopiedStyleId(current, styleId));
       showFeedback(`Copied “${styleName}”`, "success");
@@ -161,8 +167,26 @@ export function FancyTextGeneratorApp() {
         setCopiedId((current) => (current === styleId ? null : current));
       }, 1800);
     } else {
-      showFeedback("Could not copy — check browser clipboard permissions", "error");
+      setCopiedId(null);
+      setManualCopy(output);
+      showFeedback(
+        "Automatic copy was blocked. The text below is selected so you can copy it yourself.",
+        "error",
+      );
     }
+  }
+
+  function toggleCompare(styleId: string) {
+    setCompareIds((current) => {
+      if (current.includes(styleId)) {
+        return current.filter((id) => id !== styleId);
+      }
+      if (current.length >= MAX_COMPARE) {
+        showFeedback("Compare up to 3 styles. Remove one to add another.", "neutral");
+        return current;
+      }
+      return [...current, styleId];
+    });
   }
 
   function handleToggleFavorite(styleId: string) {
@@ -183,15 +207,19 @@ export function FancyTextGeneratorApp() {
     setSortMode("featured");
   }
 
-  const filterChips: { id: CategoryFilter; label: string }[] = [
+  const filterChips: { id: FancyCategoryFilter; label: string }[] = [
     { id: "all", label: "All" },
     { id: "favorites", label: "Favorites" },
     { id: "recent", label: "Recent" },
     ...FANCY_STYLE_CATEGORIES.map((item) => ({
-      id: item.id as CategoryFilter,
+      id: item.id,
       label: item.label,
     })),
   ];
+
+  const compared = compareIds
+    .map((id) => results.find((result) => result.style.id === id))
+    .filter((result): result is (typeof results)[number] => Boolean(result));
 
   const lineCount = Math.max(1, text.split("\n").length);
   const textareaRows = Math.min(6, Math.max(2, lineCount));
@@ -202,21 +230,16 @@ export function FancyTextGeneratorApp() {
         ref={studioRef}
         id="style-studio"
         aria-labelledby="fancy-workspace-heading"
-        className="overflow-hidden rounded-[1.15rem] border border-accent/20 bg-surface shadow-glow scroll-mt-24"
+        className="scroll-mt-24 overflow-hidden rounded-[1.15rem] border border-line bg-surface shadow-soft"
       >
-        <div className="flex flex-col gap-3 border-b border-line bg-gradient-to-r from-mint via-accent-soft/30 to-mint px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="flex flex-col gap-3 border-b border-line bg-mint/40 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2
-                id="fancy-workspace-heading"
-                className="font-sans text-base font-semibold text-ink sm:text-lg"
-              >
-                Style studio
-              </h2>
-              <span className="rounded-full bg-surface px-2 py-0.5 text-[0.7rem] font-medium text-accent shadow-soft">
-                Local only
-              </span>
-            </div>
+            <h2
+              id="fancy-workspace-heading"
+              className="font-display text-xl font-semibold text-ink sm:text-2xl"
+            >
+              Create Fancy Text in Seconds
+            </h2>
             <p className="mt-0.5 text-sm text-ink-muted">
               {`${FANCY_STYLES.length} Unicode styles · updates as you type`}
             </p>
@@ -228,6 +251,7 @@ export function FancyTextGeneratorApp() {
                 type="button"
                 variant={text === preset.value ? "primary" : "secondary"}
                 size="sm"
+                className="min-h-11"
                 onClick={() => {
                   setText(preset.value);
                   showFeedback(`${preset.label} example loaded`, "success");
@@ -240,6 +264,7 @@ export function FancyTextGeneratorApp() {
               type="button"
               variant="ghost"
               size="sm"
+              className="min-h-11"
               disabled={!text}
               onClick={() => {
                 setText("");
@@ -251,8 +276,11 @@ export function FancyTextGeneratorApp() {
           </div>
         </div>
 
-        <label htmlFor={editorId} className="sr-only">
-          Text to convert into fancy fonts
+        <label
+          htmlFor={editorId}
+          className="block px-4 pt-3 text-sm font-medium text-ink sm:px-5"
+        >
+          Your text
         </label>
         <textarea
           id={editorId}
@@ -265,11 +293,14 @@ export function FancyTextGeneratorApp() {
         />
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line bg-mint/30 px-4 py-2.5 sm:px-5">
-          <p className="text-sm text-ink-muted" aria-live="polite">
-            <span className="font-medium tabular-nums text-ink">
-              {text.length.toLocaleString("en-US")}
-            </span>{" "}
-            characters
+          <p className="text-sm text-ink-muted">
+            <span aria-live="polite">
+              <span className="font-medium tabular-nums text-ink">
+                {text.length.toLocaleString("en-US")}
+              </span>{" "}
+              characters
+            </span>
+            <span className="text-ink-soft"> · Unicode text, not an installed font</span>
           </p>
           <div className="min-h-[1.75rem] flex-1">
             <FeedbackMessage
@@ -279,6 +310,22 @@ export function FancyTextGeneratorApp() {
             />
           </div>
         </div>
+        {manualCopy ? (
+          <div className="border-t border-line px-4 py-3 sm:px-5">
+            <p id="fancy-manual-copy-label" role="status" className="text-sm text-danger">
+              Automatic copy was blocked. This is the exact output — select it
+              and copy manually.
+            </p>
+            <textarea
+              ref={manualCopyRef}
+              readOnly
+              aria-labelledby="fancy-manual-copy-label"
+              value={manualCopy}
+              rows={3}
+              className="mt-2 min-h-11 w-full resize-y rounded-control border border-line bg-paper px-3 py-2 text-base text-ink"
+            />
+          </div>
+        ) : null}
       </section>
 
       <section aria-labelledby="fancy-results-heading" className="space-y-3.5">
@@ -288,7 +335,7 @@ export function FancyTextGeneratorApp() {
               id="fancy-results-heading"
               className="font-display text-2xl font-semibold text-ink sm:text-[1.75rem]"
             >
-              Copy &amp; paste styles
+              Explore Fancy Text Styles
             </h2>
             <p className="mt-1 text-sm text-ink-muted" aria-live="polite">
               {isEmptyInput
@@ -311,13 +358,13 @@ export function FancyTextGeneratorApp() {
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search styles…"
-                className="h-10 w-full rounded-control border border-line bg-surface pl-10 pr-9 text-sm text-ink placeholder:text-ink-soft"
+                placeholder="Search bold, cursive, gothic, Instagram…"
+                className="h-11 w-full rounded-control border border-line bg-surface pl-10 pr-11 text-sm text-ink placeholder:text-ink-soft"
               />
               {query ? (
                 <button
                   type="button"
-                  className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-control text-ink-soft hover:bg-surface-sunken hover:text-ink"
+                  className="absolute right-1.5 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-control text-ink-soft hover:bg-surface-sunken hover:text-ink"
                   aria-label="Clear search"
                   onClick={() => setQuery("")}
                 >
@@ -335,14 +382,14 @@ export function FancyTextGeneratorApp() {
                 onChange={(event) =>
                   setSortMode(event.target.value as FancySortMode)
                 }
-                className="h-10 rounded-control border border-line bg-surface px-3 text-sm text-ink"
+                className="h-11 rounded-control border border-line bg-surface px-3 text-sm text-ink"
               >
                 <option value="featured">Featured first</option>
                 <option value="alphabetical">A–Z</option>
                 <option value="recent">Recently copied</option>
               </select>
               {(query || category !== "all" || sortMode !== "featured") && (
-                <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
+                <Button type="button" variant="ghost" size="sm" className="min-h-11" onClick={clearFilters}>
                   Reset
                 </Button>
               )}
@@ -369,7 +416,7 @@ export function FancyTextGeneratorApp() {
                 onClick={() => setCategory(chip.id)}
                 aria-pressed={category === chip.id}
                 className={cn(
-                  "shrink-0 rounded-control border px-3 py-2 text-sm font-medium transition-colors duration-200",
+                  "min-h-11 shrink-0 rounded-control border px-3 text-sm font-medium transition-colors duration-200",
                   category === chip.id
                     ? "border-accent bg-accent text-accent-foreground"
                     : "border-line bg-surface text-ink-muted hover:border-line-strong hover:bg-surface-sunken hover:text-ink",
@@ -386,7 +433,51 @@ export function FancyTextGeneratorApp() {
           })}
         </div>
 
+        <p className="sr-only">
+          Each preview is a Unicode version of your text: {deferredText}
+        </p>
         <div className="space-y-3">
+          {compared.length > 0 && !isEmptyInput ? (
+            <div className="rounded-card border border-line bg-surface p-4 shadow-soft">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-sans text-sm font-semibold text-ink">
+                  Comparing {compared.length} of {MAX_COMPARE} styles
+                </h3>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="min-h-11"
+                  onClick={() => setCompareIds([])}
+                >
+                  Clear comparison
+                </Button>
+              </div>
+              <ul className="mt-3 grid gap-3 lg:grid-cols-3">
+                {compared.map((result) => (
+                  <li
+                    key={result.style.id}
+                    className="rounded-control border border-line bg-paper p-3"
+                  >
+                    <p className="text-sm font-semibold text-ink">{result.style.name}</p>
+                    <p className="mt-2 max-h-28 overflow-auto break-words text-lg leading-7 text-ink [overflow-wrap:anywhere]">
+                      {result.output}
+                    </p>
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="mt-3 min-h-11"
+                      onClick={() =>
+                        handleCopy(result.style.id, result.output, result.style.name)
+                      }
+                    >
+                      Copy
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           {isEmptyInput ? (
             <div className="rounded-card border border-dashed border-line bg-mint/40 px-5 py-8 text-center">
               <Sparkles className="mx-auto h-6 w-6 text-accent" aria-hidden />
@@ -460,7 +551,7 @@ export function FancyTextGeneratorApp() {
                           }
                           aria-pressed={isFav}
                           className={cn(
-                            "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-control border transition-colors duration-200",
+                            "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-control border transition-colors duration-200",
                             isFav
                               ? "border-accent/30 bg-accent-soft text-accent"
                               : "border-line bg-surface text-ink-soft hover:bg-surface-sunken hover:text-ink",
@@ -474,7 +565,7 @@ export function FancyTextGeneratorApp() {
                       </div>
 
                       <p
-                        className="mt-3 break-words text-[1.2rem] leading-8 tracking-wide text-ink sm:text-[1.35rem] sm:leading-9"
+                        className="mt-3 max-h-36 min-h-12 overflow-auto break-words text-[1.2rem] leading-8 tracking-wide text-ink [overflow-wrap:anywhere] sm:text-[1.35rem] sm:leading-9"
                         lang="en"
                       >
                         <span className="sr-only">
@@ -483,12 +574,12 @@ export function FancyTextGeneratorApp() {
                         {output}
                       </p>
 
-                      <div className="mt-3 flex items-center gap-2">
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
                         <Button
                           type="button"
                           variant={isCopied ? "secondary" : "primary"}
                           size="sm"
-                          className="min-h-10 flex-1 sm:flex-none sm:min-w-[7.5rem]"
+                          className="min-h-11 flex-1 sm:flex-none sm:min-w-[7.5rem]"
                           onClick={() =>
                             handleCopy(style.id, output, style.name)
                           }
@@ -505,6 +596,16 @@ export function FancyTextGeneratorApp() {
                           )}
                           {isCopied ? "Copied" : "Copy"}
                         </Button>
+                        <Button
+                          type="button"
+                          variant={compareIds.includes(style.id) ? "primary" : "secondary"}
+                          size="sm"
+                          className="min-h-11"
+                          aria-pressed={compareIds.includes(style.id)}
+                          onClick={() => toggleCompare(style.id)}
+                        >
+                          {compareIds.includes(style.id) ? "Compared" : "Compare"}
+                        </Button>
                       </div>
                     </article>
                   </li>
@@ -518,13 +619,11 @@ export function FancyTextGeneratorApp() {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() =>
-                  setVisibleCount((count) =>
-                    Math.min(count + INITIAL_VISIBLE, ordered.length),
-                  )
-                }
+                onClick={() => setVisibleCount(ordered.length)}
               >
-                Show more styles ({ordered.length - visibleCount} left)
+                {ordered.length === FANCY_STYLES.length
+                  ? `Show all ${FANCY_STYLES.length} styles`
+                  : `Show all ${ordered.length} matching styles`}
               </Button>
             </div>
           ) : null}
@@ -537,15 +636,34 @@ export function FancyTextGeneratorApp() {
         </div>
       </section>
 
+      <FancyTextPreview
+        text={deferredText}
+        onCopied={(label) => {
+          setManualCopy(null);
+          showFeedback(`Copied “${label}”`, "success");
+        }}
+        onCopyFailed={(output) => {
+          setManualCopy(output);
+          showFeedback(
+            "Automatic copy was blocked. The text below is selected so you can copy it yourself.",
+            "error",
+          );
+        }}
+      />
+
       <FancyTextDecorations
         text={text}
-        onCopied={(label) => showFeedback(`Copied “${label}”`, "success")}
-        onCopyFailed={() =>
+        onCopied={(label) => {
+          setManualCopy(null);
+          showFeedback(`Copied “${label}”`, "success");
+        }}
+        onCopyFailed={(output) => {
+          setManualCopy(output);
           showFeedback(
-            "Could not copy — check browser clipboard permissions",
+            "Automatic copy was blocked. The text below is selected so you can copy it yourself.",
             "error",
-          )
-        }
+          );
+        }}
       />
 
       <FancyTextReversePanel />
@@ -556,7 +674,13 @@ export function FancyTextGeneratorApp() {
           className="font-medium text-accent underline-offset-2 hover:underline"
           onClick={(event) => {
             event.preventDefault();
-            studioRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            const reduceMotion = window.matchMedia(
+              "(prefers-reduced-motion: reduce)",
+            ).matches;
+            studioRef.current?.scrollIntoView({
+              behavior: reduceMotion ? "auto" : "smooth",
+              block: "start",
+            });
             document.getElementById(editorId)?.focus();
           }}
         >

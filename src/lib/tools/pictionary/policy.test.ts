@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { assertDatasetPolicy, violatesContentPolicy } from "./policy";
-import { PICTIONARY_PROMPTS, PROMPT_STATS } from "./prompts";
+import { PICTIONARY_PROMPTS } from "./prompts";
+import { PROMPT_STATS } from "./stats";
 import { PROMPT_CATEGORIES } from "./categories";
 import { drawPrompt, filterPrompts } from "./sample";
 import { createSeededRandomInt } from "./rng";
@@ -57,12 +58,33 @@ describe("pictionary content policy", () => {
     }
   });
 
-  it("covers every declared category", () => {
+  it("covers every declared category with derived counts", () => {
+    let easy = 0;
+    let medium = 0;
+    let hard = 0;
     for (const cat of PROMPT_CATEGORIES) {
-      expect(
-        PICTIONARY_PROMPTS.some((p) => p.category === cat.id),
-      ).toBe(true);
+      const tally = PROMPT_STATS.byCategory[cat.id];
+      const prompts = PICTIONARY_PROMPTS.filter((prompt) => prompt.category === cat.id);
+      expect(prompts.length).toBeGreaterThan(0);
+      expect(tally.total).toBe(prompts.length);
+      expect(tally.easy + tally.medium + tally.hard).toBe(tally.total);
+      easy += tally.easy;
+      medium += tally.medium;
+      hard += tally.hard;
     }
+    expect(easy).toBe(PROMPT_STATS.easy);
+    expect(medium).toBe(PROMPT_STATS.medium);
+    expect(hard).toBe(PROMPT_STATS.hard);
+    expect(PROMPT_STATS.easy + PROMPT_STATS.medium + PROMPT_STATS.hard).toBe(PROMPT_STATS.total);
+  });
+
+  it("does not keep unclear or animal-reef prompts that were rewritten", () => {
+    const texts = PICTIONARY_PROMPTS.map((prompt) => prompt.text.toLowerCase());
+    expect(texts).not.toContain("coral reef");
+    expect(texts).not.toContain("barrier reef");
+    expect(texts).not.toContain("suspension of mist over canyon");
+    expect(texts).toContain("mist over a canyon");
+    expect(texts).toContain("sea stack");
   });
 });
 

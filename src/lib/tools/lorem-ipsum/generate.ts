@@ -1,11 +1,17 @@
 import { CLASSIC_LOREM_PASSAGE, CLASSIC_LOREM_WORDS } from "./classic";
-import { createCryptoRandomInt, type RandomIntFn } from "./rng";
+import {
+  createCryptoRandomInt,
+  createSeededRandomInt,
+  type RandomIntFn,
+} from "./rng";
 import {
   PARAGRAPH_WORD_RANGES,
   QUANTITY_LIMITS,
   type GenerateOptions,
   type GeneratedDocument,
   type GenerationMode,
+  type ListItemLength,
+  type ListStyle,
   type ParagraphLength,
 } from "./types";
 import {
@@ -450,11 +456,73 @@ function generateCharacters(
   });
 }
 
+const LIST_ITEM_WORD_RANGES: Record<
+  ListItemLength,
+  { min: number; max: number }
+> = {
+  short: { min: 4, max: 7 },
+  medium: { min: 8, max: 14 },
+  long: { min: 15, max: 22 },
+};
+
+function listItemWordTarget(length: ListItemLength, rng: RandomIntFn): number {
+  const range = LIST_ITEM_WORD_RANGES[length];
+  return range.min + rng(range.max - range.min + 1);
+}
+
+function generateLists(
+  quantity: number,
+  itemLength: ListItemLength,
+  listStyle: ListStyle,
+  classicOpening: boolean,
+  rng: RandomIntFn,
+): GeneratedDocument {
+  const items: string[] = [];
+  let classicOpeningAbbreviated = false;
+
+  for (let i = 0; i < quantity; i += 1) {
+    const target = listItemWordTarget(itemLength, rng);
+    if (i === 0 && classicOpening) {
+      items.push(wordsToSentenceish(takeClassicWords(target)));
+      classicOpeningAbbreviated = target < CLASSIC_LOREM_WORDS.length;
+    } else {
+      items.push(buildSentence(rng, target, items));
+    }
+  }
+
+  return baseDoc({
+    paragraphs: items,
+    mode: "lists",
+    requestedQuantity: quantity,
+    classicOpening,
+    classicOpeningAbbreviated,
+    textKind: "lorem",
+    listStyle,
+  });
+}
+
 function generateUiEnglish(
   mode: GenerationMode,
   quantity: number,
   rng: RandomIntFn,
+  listStyle: ListStyle,
 ): GeneratedDocument {
+  if (mode === "lists") {
+    const items: string[] = [];
+    for (let i = 0; i < quantity; i += 1) {
+      items.push(UI_LABELS[rng(UI_LABELS.length)]!);
+    }
+    return baseDoc({
+      paragraphs: items,
+      mode,
+      requestedQuantity: quantity,
+      classicOpening: false,
+      classicOpeningAbbreviated: false,
+      textKind: "ui-english",
+      listStyle,
+    });
+  }
+
   if (mode === "words" || mode === "characters") {
     const labels: string[] = [];
     while (
@@ -527,14 +595,21 @@ function generateUiEnglish(
 export function generateLorem(options: GenerateOptions): GeneratedDocument {
   const mode = options.mode;
   const quantity = clampQuantity(mode, options.quantity);
-  const rng = options.randomInt ?? createCryptoRandomInt();
+  const seed = options.seed;
+  const rng =
+    options.randomInt ??
+    (typeof seed === "number" && Number.isInteger(seed)
+      ? createSeededRandomInt(seed)
+      : createCryptoRandomInt());
   const classicOpening = Boolean(options.classicOpening);
   const paragraphLength: ParagraphLength = options.paragraphLength ?? "medium";
   const textKind = options.textKind ?? "lorem";
   const preferCompleteWords = Boolean(options.preferCompleteWords);
+  const listStyle: ListStyle = options.listStyle ?? "unordered";
+  const listItemLength: ListItemLength = options.listItemLength ?? "medium";
 
   if (textKind === "ui-english") {
-    return generateUiEnglish(mode, quantity, rng);
+    return generateUiEnglish(mode, quantity, rng, listStyle);
   }
 
   switch (mode) {
@@ -551,6 +626,14 @@ export function generateLorem(options: GenerateOptions): GeneratedDocument {
         preferCompleteWords,
         rng,
       );
+    case "lists":
+      return generateLists(
+        quantity,
+        listItemLength,
+        listStyle,
+        classicOpening,
+        rng,
+      );
     default: {
       const _exhaustive: never = mode;
       return _exhaustive;
@@ -558,8 +641,23 @@ export function generateLorem(options: GenerateOptions): GeneratedDocument {
   }
 }
 
-/** Plain-text body: paragraphs separated by a blank line. */
+function listMarker(style: ListStyle, index: number): string {
+  return style === "ordered" ? `${index + 1}. ` : "- ";
+}
+
+/** Plain-text body. Lists use one marker per line; other modes use blank lines. */
 export function documentToPlainText(doc: GeneratedDocument): string {
+  if (doc.mode === "lists") {
+    const style = doc.listStyle ?? "unordered";
+    return doc.paragraphs
+      .map((item, index) => `${listMarker(style, index)}${item}`)
+      .join("\n");
+  }
+  return doc.paragraphs.join("\n\n");
+}
+
+/** Placeholder words only, without list markers or HTML. */
+export function documentStatsText(doc: GeneratedDocument): string {
   return doc.paragraphs.join("\n\n");
 }
 

@@ -13,7 +13,7 @@ import { cn, copyTextToClipboard } from "@/lib/utils";
 interface FancyTextDecorationsProps {
   text: string;
   onCopied?: (label: string) => void;
-  onCopyFailed?: () => void;
+  onCopyFailed?: (output: string) => void;
 }
 
 export function FancyTextDecorations({
@@ -42,7 +42,7 @@ export function FancyTextDecorations({
         setCopiedId((current) => (current === item.id ? null : current));
       }, 1600);
     } else {
-      onCopyFailed?.();
+      onCopyFailed?.(output);
     }
   }
 
@@ -68,6 +68,7 @@ export function FancyTextDecorations({
           type="button"
           variant="secondary"
           size="sm"
+          className="min-h-11"
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
         >
@@ -87,7 +88,7 @@ export function FancyTextDecorations({
               aria-pressed={activeCategory === "all"}
               onClick={() => setActiveCategory("all")}
               className={cn(
-                "shrink-0 rounded-control border px-3 py-1.5 text-sm font-medium",
+                "min-h-11 shrink-0 rounded-control border px-3 text-sm font-medium",
                 activeCategory === "all"
                   ? "border-accent bg-accent text-accent-foreground"
                   : "border-line bg-surface text-ink-muted",
@@ -102,7 +103,7 @@ export function FancyTextDecorations({
                 aria-pressed={activeCategory === cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={cn(
-                  "shrink-0 rounded-control border px-3 py-1.5 text-sm font-medium",
+                  "min-h-11 shrink-0 rounded-control border px-3 text-sm font-medium",
                   activeCategory === cat.id
                     ? "border-accent bg-accent text-accent-foreground"
                     : "border-line bg-surface text-ink-muted",
@@ -130,7 +131,7 @@ export function FancyTextDecorations({
                       type="button"
                       variant="secondary"
                       size="sm"
-                      className="mt-3 self-start"
+                      className="mt-3 min-h-11 self-start"
                       onClick={() => handleCopy(item)}
                       aria-label={`Copy ${item.label} decoration`}
                     >

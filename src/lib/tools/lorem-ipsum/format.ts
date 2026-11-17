@@ -14,17 +14,33 @@ function escapeHtml(text: string): string {
     .replace(/'/g, "&#39;");
 }
 
-/** Paragraph body only — safe for in-app rendered preview. */
+/** Body markup only — item text is escaped. Safe for a rendered preview. */
 export function documentToHtmlBody(doc: GeneratedDocument): string {
-  return doc.paragraphs
-    .map((p) => p.trim())
-    .filter(Boolean)
-    .map((p) => `<p>${escapeHtml(p)}</p>`)
-    .join("\n");
+  const blocks = doc.paragraphs.map((p) => p.trim()).filter(Boolean);
+  if (doc.mode === "lists") {
+    const tag = doc.listStyle === "ordered" ? "ol" : "ul";
+    const items = blocks.map((p) => `<li>${escapeHtml(p)}</li>`).join("\n");
+    return `<${tag}>\n${items}\n</${tag}>`;
+  }
+  return blocks.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
 }
 
 export function documentToMarkdown(doc: GeneratedDocument): string {
-  return doc.paragraphs.map((p) => p.trim()).filter(Boolean).join("\n\n");
+  const blocks = doc.paragraphs.map((p) => p.trim()).filter(Boolean);
+  if (doc.mode === "lists") {
+    return blocks
+      .map((item, index) =>
+        doc.listStyle === "ordered" ? `${index + 1}. ${item}` : `- ${item}`,
+      )
+      .join("\n");
+  }
+  return blocks.join("\n\n");
+}
+
+export function mimeTypeFor(format: OutputFormat): string {
+  if (format === "html") return "text/html;charset=utf-8";
+  if (format === "markdown") return "text/markdown;charset=utf-8";
+  return "text/plain;charset=utf-8";
 }
 
 /** Serialize a stored document into the selected output format without regenerating. */
@@ -47,6 +63,8 @@ export function serializeDocument(
       ? `<style>
 body{font-family:Georgia,"Times New Roman",serif;line-height:1.7;max-width:42rem;margin:2rem auto;padding:0 1.25rem;color:#1a2332;}
 p{margin:0 0 1.1em;}
+ul,ol{margin:0 0 1.1em;padding-left:1.4em;}
+li{margin:0.35em 0;}
 </style>`
       : "";
 

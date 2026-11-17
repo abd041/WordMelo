@@ -1,4 +1,13 @@
-export type GenerationMode = "paragraphs" | "sentences" | "words" | "characters";
+export type GenerationMode =
+  | "paragraphs"
+  | "sentences"
+  | "words"
+  | "characters"
+  | "lists";
+
+export type ListStyle = "unordered" | "ordered";
+
+export type ListItemLength = "short" | "medium" | "long";
 
 export type ParagraphLength = "short" | "medium" | "long" | "variable";
 
@@ -15,6 +24,8 @@ export interface GeneratedDocument {
   classicOpening: boolean;
   classicOpeningAbbreviated: boolean;
   textKind: "lorem" | "ui-english";
+  /** List mode only. Items live in `paragraphs`. */
+  listStyle?: ListStyle;
   /** Character mode: whether output meets exact UTF-16 target. */
   exactUtf16: boolean;
   /** Character mode: Prefer-complete-words was used. */
@@ -34,6 +45,13 @@ export interface GenerateOptions {
    * undershoot the target. Never labeled exact when short of the target.
    */
   preferCompleteWords?: boolean;
+  listStyle?: ListStyle;
+  listItemLength?: ListItemLength;
+  /**
+   * Optional deterministic seed. Ignored when `randomInt` is provided.
+   * The same seed and settings produce the same text.
+   */
+  seed?: number;
   /** Injected RNG for tests: returns integer in [0, maxExclusive). */
   randomInt?: (maxExclusive: number) => number;
 }
@@ -49,6 +67,7 @@ export const QUANTITY_LIMITS: Record<GenerationMode, QuantityLimits> = {
   sentences: { min: 1, max: 250, default: 5 },
   words: { min: 1, max: 5000, default: 100 },
   characters: { min: 1, max: 20000, default: 280 },
+  lists: { min: 1, max: 50, default: 5 },
 };
 
 export const PARAGRAPH_WORD_RANGES: Record<

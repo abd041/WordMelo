@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useId, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { fancyTextToPlain } from "@/lib/tools/fancy-text";
@@ -11,19 +11,27 @@ export function FancyTextReversePanel() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [manualCopy, setManualCopy] = useState<string | null>(null);
+  const manualRef = useRef<HTMLTextAreaElement>(null);
   const deferred = useDeferredValue(input);
   const plain = useMemo(() => fancyTextToPlain(deferred), [deferred]);
+
+  useEffect(() => {
+    if (!manualCopy) return;
+    manualRef.current?.focus();
+    manualRef.current?.select();
+  }, [manualCopy]);
 
   async function handleCopy() {
     if (!plain) return;
     const ok = await copyTextToClipboard(plain);
     if (ok) {
       setCopied(true);
-      setError(null);
+      setManualCopy(null);
       window.setTimeout(() => setCopied(false), 1600);
     } else {
-      setError("Could not copy — check clipboard permissions");
+      setCopied(false);
+      setManualCopy(plain);
     }
   }
 
@@ -49,6 +57,7 @@ export function FancyTextReversePanel() {
           type="button"
           variant="secondary"
           size="sm"
+          className="min-h-11"
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
         >
@@ -103,10 +112,21 @@ export function FancyTextReversePanel() {
             >
               Clear
             </Button>
-            {error ? (
-              <p role="status" className="text-sm text-danger">
-                {error}
-              </p>
+            {manualCopy ? (
+              <div className="basis-full">
+                <p id={`${inputId}-manual`} role="status" className="text-sm text-danger">
+                  Automatic copy was blocked. This plain text is selected so you
+                  can copy it yourself.
+                </p>
+                <textarea
+                  ref={manualRef}
+                  readOnly
+                  aria-labelledby={`${inputId}-manual`}
+                  value={manualCopy}
+                  rows={3}
+                  className="mt-2 w-full resize-y rounded-control border border-line bg-paper px-3 py-2 text-base text-ink"
+                />
+              </div>
             ) : null}
           </div>
         </div>

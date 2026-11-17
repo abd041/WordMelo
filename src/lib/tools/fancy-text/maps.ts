@@ -138,7 +138,7 @@ export const SMALL_CAPS: Record<string, string> = {
   u: "ᴜ",
   v: "ᴠ",
   w: "ᴡ",
-  x: "x",
+  x: "ˣ",
   y: "ʏ",
   z: "ᴢ",
   A: "ᴀ",
@@ -164,7 +164,7 @@ export const SMALL_CAPS: Record<string, string> = {
   U: "ᴜ",
   V: "ᴠ",
   W: "ᴡ",
-  X: "x",
+  X: "ˣ",
   Y: "ʏ",
   Z: "ᴢ",
 };

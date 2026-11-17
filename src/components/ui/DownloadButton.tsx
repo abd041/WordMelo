@@ -7,6 +7,8 @@ import { downloadTextFile } from "@/lib/utils";
 interface DownloadButtonProps {
   text: string;
   filename?: string;
+  label?: string;
+  mimeType?: string;
   disabled?: boolean;
   onFeedback?: (message: string, tone?: "success" | "error") => void;
 }
@@ -14,12 +16,14 @@ interface DownloadButtonProps {
 export function DownloadButton({
   text,
   filename = "wordmelo-text.txt",
+  label = "Download TXT",
+  mimeType = "text/plain;charset=utf-8",
   disabled,
   onFeedback,
 }: DownloadButtonProps) {
   function handleDownload() {
     if (!text) return;
-    downloadTextFile(filename, text);
+    downloadTextFile(filename, text, mimeType);
     onFeedback?.("Download started", "success");
   }
 
@@ -30,10 +34,10 @@ export function DownloadButton({
       size="sm"
       onClick={handleDownload}
       disabled={disabled || !text}
-      aria-label="Download as text file"
+      aria-label={label}
     >
       <Download className="h-4 w-4" aria-hidden />
-      Download TXT
+      {label}
     </Button>
   );
 }

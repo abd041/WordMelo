@@ -146,6 +146,16 @@ describe("every style mapping", () => {
     }
   });
 
+  it("keeps unsupported Urdu letters present", () => {
+    const input = "اردو";
+    for (const style of FANCY_STYLES) {
+      const out = style.transform(input);
+      for (const ch of input) {
+        expect(out.includes(ch)).toBe(true);
+      }
+    }
+  });
+
   it("keeps unsupported Arabic letters present", () => {
     const input = "مرحبا";
     for (const style of FANCY_STYLES) {
@@ -238,6 +248,7 @@ describe("map coverage smoke checks", () => {
   it("small caps maps lowercase latin", () => {
     for (const ch of "abcdefghijklmnopqrstuvwxyz") {
       expect(SMALL_CAPS[ch]).toBeDefined();
+      expect(SMALL_CAPS[ch]).not.toBe(ch);
     }
   });
 

@@ -2,11 +2,12 @@ import { describe, expect, it } from "vitest";
 import { formatTimer, remainingFromDeadline } from "./game-timer";
 
 describe("game timer helpers", () => {
-  it("formats mm:ss", () => {
+  it("formats mm:ss and never shows a negative clock", () => {
     expect(formatTimer(0)).toBe("0:00");
     expect(formatTimer(59)).toBe("0:59");
     expect(formatTimer(60)).toBe("1:00");
     expect(formatTimer(125)).toBe("2:05");
+    expect(formatTimer(-4)).toBe("0:00");
   });
 
   it("derives remaining time from a deadline", () => {

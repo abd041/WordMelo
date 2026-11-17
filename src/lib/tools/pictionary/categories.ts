@@ -60,7 +60,7 @@ export const PROMPT_CATEGORIES: PromptCategoryMeta[] = [
   {
     id: "weather",
     label: "Weather & nature",
-    description: "Weather phenomena and non-living natural forms.",
+    description: "Weather, sky, and outdoor natural scenes.",
   },
   {
     id: "tools",

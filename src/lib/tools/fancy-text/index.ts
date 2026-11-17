@@ -32,3 +32,18 @@ export {
 } from "./decorations";
 
 export { splitGraphemes, isEmojiLikeCluster } from "./graphemes";
+
+export {
+  STYLE_SEARCH_ALIASES,
+  filterFancyResults,
+  styleMatchesQuery,
+  type FancyCategoryFilter,
+} from "./search";
+
+export {
+  NAME_FRAMES,
+  PLATFORM_PREVIEWS,
+  buildStyledName,
+  nameSourceLine,
+  renderPlatformPreview,
+} from "./preview";

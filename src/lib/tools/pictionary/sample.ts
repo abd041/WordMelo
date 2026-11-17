@@ -46,8 +46,8 @@ export function drawPrompt(
       exhausted: true,
       message:
         fullPool.length === 0
-          ? "No prompts match these filters. Try more categories or Mixed difficulty."
-          : "Every matching prompt was already used this session. Reset the session to continue.",
+          ? "No prompts match these filters. Try All categories or Mixed difficulty."
+          : "You've used every word in this selection. Reset the word pool or change your filters.",
     };
   }
 

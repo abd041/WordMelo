@@ -297,6 +297,95 @@ describe("vocabulary quality", () => {
   });
 });
 
+describe("exact counts", () => {
+  it("counts classic opening words inside the requested word total", () => {
+    for (const quantity of [1, 10, 100, 1000, 5000]) {
+      const doc = generateLorem({
+        mode: "words",
+        quantity,
+        classicOpening: true,
+        seed: quantity,
+      });
+      expect(countWords(documentToPlainText(doc))).toBe(quantity);
+      if (quantity >= 5) {
+        expect(documentToPlainText(doc).toLowerCase().startsWith("lorem ipsum dolor sit amet")).toBe(true);
+      }
+    }
+  });
+
+  it("hits exact UTF-16 lengths", () => {
+    for (const quantity of [1, 10, 50, 100, 150, 500, 1000]) {
+      const doc = generateLorem({
+        mode: "characters",
+        quantity,
+        classicOpening: false,
+        seed: quantity,
+      });
+      expect(documentToPlainText(doc).length).toBe(quantity);
+      expect(doc.exactUtf16).toBe(true);
+    }
+  });
+});
+
+describe("list generation", () => {
+  it("returns the requested number of items", () => {
+    const doc = generateLorem({
+      mode: "lists",
+      quantity: 6,
+      listStyle: "ordered",
+      listItemLength: "short",
+      classicOpening: true,
+      seed: 4,
+    });
+    expect(doc.paragraphs).toHaveLength(6);
+    expect(doc.paragraphs.every((item) => item.trim().length > 0)).toBe(true);
+    expect(doc.paragraphs[0]!.toLowerCase().startsWith("lorem ipsum")).toBe(true);
+    const plain = documentToPlainText(doc);
+    expect(plain.startsWith("1. ")).toBe(true);
+    expect(plain).toContain("\n2. ");
+    expect(serializeDocument(doc, "html")).toContain("<ol>");
+    expect(serializeDocument(doc, "html")).toContain("<li>");
+    expect(serializeDocument(doc, "markdown")).toContain("1. ");
+  });
+
+  it("escapes list item text in HTML", () => {
+    const html = serializeDocument(
+      {
+        paragraphs: ["Use <b> & quotes"],
+        mode: "lists",
+        listStyle: "unordered",
+        requestedQuantity: 1,
+        classicOpening: false,
+        classicOpeningAbbreviated: false,
+        textKind: "lorem",
+        exactUtf16: true,
+        preferCompleteWords: false,
+        actualUtf16Length: null,
+      },
+      "html",
+    );
+    expect(html).toContain("<ul>");
+    expect(html).toContain("&lt;b&gt;");
+    expect(html).not.toContain("<b>");
+  });
+});
+
+describe("seeded generation option", () => {
+  it("repeats when the seed and settings match", () => {
+    const first = documentToPlainText(
+      generateLorem({ mode: "paragraphs", quantity: 2, paragraphLength: "short", seed: 77 }),
+    );
+    const second = documentToPlainText(
+      generateLorem({ mode: "paragraphs", quantity: 2, paragraphLength: "short", seed: 77 }),
+    );
+    expect(first).toBe(second);
+    const other = documentToPlainText(
+      generateLorem({ mode: "paragraphs", quantity: 2, paragraphLength: "short", seed: 78 }),
+    );
+    expect(other).not.toBe(first);
+  });
+});
+
 describe("deterministic RNG", () => {
   it("repeats with the same seed", () => {
     const a = documentToPlainText(

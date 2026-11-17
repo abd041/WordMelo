@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { LoremIpsumAppLoader } from "@/components/tools/lorem-ipsum/LoremIpsumAppLoader";
+import { LoremIpsumApp } from "@/components/tools/lorem-ipsum/LoremIpsumApp";
 import { RelatedTools } from "@/components/tools/RelatedTools";
 import { ToolFAQ } from "@/components/tools/ToolFAQ";
 import { ToolHeader } from "@/components/tools/ToolHeader";
@@ -16,9 +16,9 @@ import {
 import { countWords } from "@/lib/tools/word-counter/count";
 
 export const metadata = createPageMetadata({
-  title: "Lorem Ipsum Generator — Free Dummy Text | WordMelo",
+  title: "Lorem Ipsum Generator – Free Dummy Text | WordMelo",
   description:
-    "Generate Lorem Ipsum paragraphs, sentences, words, and exact-length dummy text. Preview typography, copy HTML or Markdown, and download text for free.",
+    "Generate free Lorem Ipsum dummy text by paragraphs, sentences, words, or characters. Preview layouts and copy or download plain text, HTML, and Markdown.",
   path: "/lorem-ipsum-generator",
   keywords: [
     "lorem ipsum generator",
@@ -64,12 +64,12 @@ const faqItems = [
   {
     question: "How do I generate Lorem Ipsum text?",
     answer:
-      "Choose paragraphs, sentences, words, or characters, set a quantity, optionally keep the classic opening, then press Generate. Copy or download as plain text, HTML, or Markdown.",
+      "Choose paragraphs, sentences, words, characters, or lists, set a quantity, optionally keep the classic opening, then press Generate. Copy or download as plain text, HTML, or Markdown.",
   },
   {
-    question: "Can I generate exact word counts?",
+    question: "Can I generate exactly 100 words?",
     answer:
-      "Yes. Words mode builds exactly the requested count (up to 5,000), measured with the same rules as WordMelo’s Word Counter.",
+      "Yes. Words mode returns that many words, up to 5,000. If the classic opening is on, those opening words count toward the total instead of being added on top.",
   },
   {
     question: "Can I generate exact character lengths?",
@@ -100,6 +100,21 @@ const faqItems = [
     question: "Should I use Lorem Ipsum on a live website?",
     answer:
       "No. Use it for mockups and prototypes, then replace it with real content before launch.",
+  },
+  {
+    question: "Can I generate a bulleted or numbered list?",
+    answer:
+      "Yes. Lists mode builds an exact number of items and exports them as plain text, a ul or ol element, or Markdown list syntax.",
+  },
+  {
+    question: "Can I repeat the same placeholder text?",
+    answer:
+      "Yes. Enter a seed, then use the same mode, amount, and length. Copy link saves those settings in the address bar. The canonical page stays /lorem-ipsum-generator.",
+  },
+  {
+    question: "Can I use this Lorem Ipsum in a commercial project?",
+    answer:
+      "Yes. The text is placeholder filler for mockups. Replace it with your own copy before you publish a real page.",
   },
   {
     question: "Is generation processed locally?",
@@ -136,6 +151,7 @@ export default function LoremIpsumGeneratorPage() {
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any",
     browserRequirements: "Requires a modern browser with JavaScript enabled.",
+    isAccessibleForFree: true,
     offers: {
       "@type": "Offer",
       price: "0",
@@ -156,13 +172,13 @@ export default function LoremIpsumGeneratorPage() {
         className="pt-6 sm:pt-8"
       >
         <ToolHeader
-          title="Lorem Ipsum Generator — Free Placeholder Text"
-          description="Generate Lorem Ipsum paragraphs, sentences, words, or exact-length dummy text. Preview typography and copy or download your content in seconds."
+          title="Lorem Ipsum Generator – Free Placeholder Text"
+          description="Generate Lorem Ipsum placeholder text by paragraphs, sentences, words, or characters. Preview layouts and copy or download your text in seconds."
           privacyNote="Generation stays in your browser — nothing is uploaded."
         />
 
         <div className="mt-7 sm:mt-8">
-          <LoremIpsumAppLoader />
+          <LoremIpsumApp />
         </div>
 
         <section className="prose-wordmelo mt-14 max-w-3xl space-y-9">
@@ -191,7 +207,7 @@ export default function LoremIpsumGeneratorPage() {
               <li>Pick paragraphs, sentences, words, or characters.</li>
               <li>Set quantity and paragraph length when relevant.</li>
               <li>Optionally start with the classic opening.</li>
-              <li>Generate, then copy or download plain text, HTML, or Markdown.</li>
+              <li>Generate, then copy or download plain text, HTML, or Markdown. Add a seed if you need the same text again.</li>
             </ol>
           </div>
 
@@ -287,7 +303,8 @@ export default function LoremIpsumGeneratorPage() {
             </div>
             <p className="text-sm text-ink-muted">
               Switching formats never regenerates words — only Generate /
-              Regenerate create new text.
+              Regenerate create new text. Lists mode uses a <code>&lt;ul&gt;</code>{" "}
+              or <code>&lt;ol&gt;</code> in HTML and matching Markdown markers.
             </p>
           </div>
 
