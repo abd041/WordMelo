@@ -251,6 +251,10 @@ export default function WordCounterPage() {
                 Seeing which words repeat in the{" "}
                 <Link href="/word-cloud-generator">Word Cloud Generator</Link>.
               </li>
+              <li>
+                Comparing two drafts in{" "}
+                <Link href="/text-compare">Text Compare</Link>.
+              </li>
             </ul>
 
             <h2>Normalize casing or style a short bio</h2>

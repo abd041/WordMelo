@@ -344,7 +344,9 @@ export default function CharacterCounterPage() {
               same label. If Segmenter is missing, grapheme stats report
               unavailable while code-point and UTF-16 metrics remain. For word
               frequency and reading-time estimates, open the{" "}
-              <Link href="/word-counter">Word Counter</Link>.
+              <Link href="/word-counter">Word Counter</Link>. To highlight
+              edits between two pastes, use{" "}
+              <Link href="/text-compare">Text Compare</Link>.
             </p>
             <ul className="mt-3 text-sm text-ink-muted">
               {CHARACTER_COUNTER_RULES_SUMMARY.map((rule) => (

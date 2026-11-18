@@ -37,7 +37,8 @@ export interface ToolDefinition {
     | "pictionary"
     | "letter"
     | "lorem"
-    | "cloud";
+    | "cloud"
+    | "compare";
 }
 
 export interface PublishedTool extends ToolDefinition {

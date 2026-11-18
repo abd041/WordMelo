@@ -40,7 +40,9 @@ export function HomeIntro() {
             <Link href="/lorem-ipsum-generator">Lorem Ipsum Generator</Link> for
             design placeholder text, and the{" "}
             <Link href="/word-cloud-generator">Word Cloud Generator</Link> to
-            picture which words repeat. Only finished tools are listed as
+            picture which words repeat, and{" "}
+            <Link href="/text-compare">Text Compare</Link> to highlight added
+            and removed words. Only finished tools are listed as
             available.
           </p>
         </div>

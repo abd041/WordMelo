@@ -292,6 +292,8 @@ export default function CaseConverterPage() {
               <Link href="/fancy-text-generator">Fancy Text Generator</Link>, or
               gather prompts with the{" "}
               <Link href="/random-word-generator">Random Word Generator</Link>.
+              To see what changed between two versions, use{" "}
+              <Link href="/text-compare">Text Compare</Link>.
             </p>
           </div>
         </section>

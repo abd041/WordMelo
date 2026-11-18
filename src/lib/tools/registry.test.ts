@@ -6,11 +6,11 @@ import {
 } from "./registry";
 
 describe("published tool registry", () => {
-  it("publishes eleven distinct routes", () => {
+  it("publishes twelve distinct routes", () => {
     const tools = getPublishedTools();
     const hrefs = tools.map((tool) => tool.href);
-    expect(tools).toHaveLength(11);
-    expect(new Set(hrefs).size).toBe(11);
+    expect(tools).toHaveLength(12);
+    expect(new Set(hrefs).size).toBe(12);
     expect(hrefs.every((href) => href.startsWith("/"))).toBe(true);
   });
 
@@ -22,7 +22,10 @@ describe("published tool registry", () => {
   });
 
   it("search matches names and ignores empty queries", () => {
-    expect(searchPublishedTools("   ")).toHaveLength(11);
+    expect(searchPublishedTools("   ")).toHaveLength(12);
+    expect(
+      searchPublishedTools("text compare").some((tool) => tool.id === "text-compare"),
+    ).toBe(true);
     expect(
       searchPublishedTools("word cloud").some(
         (tool) => tool.id === "word-cloud-generator",

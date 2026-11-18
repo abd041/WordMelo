@@ -310,6 +310,27 @@ export const tools: ToolDefinition[] = [
     href: "/word-cloud-generator",
     icon: "cloud",
   },
+  {
+    id: "text-compare",
+    name: "Text Compare",
+    slug: "text-compare",
+    status: "published",
+    categoryId: "counting",
+    summary: "Compare two texts and highlight added, removed, and changed words.",
+    description:
+      "Compare two texts online. Highlight added, removed, and changed words or lines, then copy or download the result — processed locally in your browser.",
+    keywords: [
+      "text compare",
+      "compare text online",
+      "compare two texts",
+      "text difference checker",
+      "online text diff",
+      "find differences between two texts",
+      "text comparison tool",
+    ],
+    href: "/text-compare",
+    icon: "compare",
+  },
 ];
 
 export function getPublishedTools(): PublishedTool[] {

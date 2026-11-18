@@ -3,6 +3,7 @@ import {
   AlignLeft,
   CaseSensitive,
   Cloud,
+  GitCompare,
   Binary,
   Hash,
   Italic,
@@ -27,6 +28,7 @@ const icons = {
   letter: WholeWord,
   lorem: AlignLeft,
   cloud: Cloud,
+  compare: GitCompare,
 } as const;
 
 interface ToolCardProps {
@@ -102,7 +104,9 @@ export function ToolCard({ tool, className, featured = false }: ToolCardProps) {
                               ? "Open Lorem Ipsum Generator"
                               : tool.id === "word-cloud-generator"
                                 ? "Open Word Cloud Generator"
-                                : "Open tool"}
+                                : tool.id === "text-compare"
+                                  ? "Open Text Compare Tool"
+                                  : "Open tool"}
           <span aria-hidden="true" className="ml-1">
             →
           </span>

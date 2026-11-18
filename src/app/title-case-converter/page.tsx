@@ -404,7 +404,9 @@ export default function TitleCaseConverterPage() {
               scoped. For general UPPERCASE/lowercase/camelCase transforms, use
               the <Link href="/case-converter">Case Converter</Link>. For length
               checks, try the <Link href="/word-counter">Word Counter</Link> or{" "}
-              <Link href="/character-counter">Character Counter</Link>.
+              <Link href="/character-counter">Character Counter</Link>. To mark
+              what changed between two versions, use{" "}
+              <Link href="/text-compare">Text Compare</Link>.
             </p>
           </div>
         </section>

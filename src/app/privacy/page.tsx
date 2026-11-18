@@ -33,7 +33,7 @@ export default function PrivacyPage() {
           <p>
             WordMelo’s tools run in your browser. Text you type or paste into a
             tool is processed on your device to generate counts, conversions,
-            styles, word clouds, random samples, or placeholder content. That tool content is
+            styles, comparisons, word clouds, random samples, or placeholder content. That tool content is
             not transmitted to WordMelo servers for processing, logging,
             analytics, or third-party analysis.
           </p>
