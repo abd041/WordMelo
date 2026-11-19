@@ -42,7 +42,9 @@ export function HomeIntro() {
             <Link href="/word-cloud-generator">Word Cloud Generator</Link> to
             picture which words repeat, and{" "}
             <Link href="/text-compare">Text Compare</Link> to highlight added
-            and removed words. Only finished tools are listed as
+            and removed words, and the{" "}
+            <Link href="/alphabetizer">Alphabetizer</Link> to put a list in
+            A–Z or numeric order. Only finished tools are listed as
             available.
           </p>
         </div>

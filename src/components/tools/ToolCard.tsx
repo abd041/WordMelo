@@ -3,6 +3,7 @@ import {
   AlignLeft,
   CaseSensitive,
   Cloud,
+  ArrowUpAZ,
   GitCompare,
   Binary,
   Hash,
@@ -29,6 +30,7 @@ const icons = {
   lorem: AlignLeft,
   cloud: Cloud,
   compare: GitCompare,
+  sort: ArrowUpAZ,
 } as const;
 
 interface ToolCardProps {
@@ -106,7 +108,9 @@ export function ToolCard({ tool, className, featured = false }: ToolCardProps) {
                                 ? "Open Word Cloud Generator"
                                 : tool.id === "text-compare"
                                   ? "Open Text Compare Tool"
-                                  : "Open tool"}
+                                  : tool.id === "alphabetizer"
+                                    ? "Open Alphabetizer"
+                                    : "Open tool"}
           <span aria-hidden="true" className="ml-1">
             →
           </span>

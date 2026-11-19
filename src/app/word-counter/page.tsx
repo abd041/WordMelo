@@ -255,6 +255,10 @@ export default function WordCounterPage() {
                 Comparing two drafts in{" "}
                 <Link href="/text-compare">Text Compare</Link>.
               </li>
+              <li>
+                Putting a word list in order with the{" "}
+                <Link href="/alphabetizer">Alphabetizer</Link>.
+              </li>
             </ul>
 
             <h2>Normalize casing or style a short bio</h2>

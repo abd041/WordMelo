@@ -331,6 +331,29 @@ export const tools: ToolDefinition[] = [
     href: "/text-compare",
     icon: "compare",
   },
+  {
+    id: "alphabetizer",
+    name: "Alphabetizer",
+    slug: "alphabetizer",
+    status: "published",
+    categoryId: "conversion",
+    summary: "Sort words, names, and lists A–Z, by number, or by last name.",
+    description:
+      "Alphabetize a list in your browser. Sort A–Z or Z–A, sort numbers and names, remove duplicates, then copy or download the result.",
+    keywords: [
+      "alphabetizer",
+      "alphabetical order generator",
+      "alphabetize list",
+      "alphabetize words",
+      "sort text online",
+      "alphabetical order tool",
+      "sort lines alphabetically",
+      "put words in alphabetical order",
+      "alphabetical order sorter",
+    ],
+    href: "/alphabetizer",
+    icon: "sort",
+  },
 ];
 
 export function getPublishedTools(): PublishedTool[] {

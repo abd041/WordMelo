@@ -141,7 +141,9 @@ export default function TextComparePage() {
               <Link href="/character-counter">Character Counter</Link>. To change
               case before you compare, use the{" "}
               <Link href="/case-converter">Case Converter</Link> or the{" "}
-              <Link href="/title-case-converter">Title Case Converter</Link>.
+              <Link href="/title-case-converter">Title Case Converter</Link>. To
+              put a finished list in order, use the{" "}
+              <Link href="/alphabetizer">Alphabetizer</Link>.
             </li>
           </ul>
           <p>

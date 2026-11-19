@@ -46,7 +46,7 @@ describe("text compare page metadata", () => {
       .filter((url) => url.includes("text-compare"));
     expect(urls).toEqual(["https://wordmelo.com/text-compare"]);
     const tools = getPublishedTools();
-    expect(tools).toHaveLength(12);
+    expect(tools).toHaveLength(13);
     expect(tools.filter((tool) => tool.href === TEXT_COMPARE_PATH)).toHaveLength(1);
   });
 

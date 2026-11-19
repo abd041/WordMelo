@@ -38,7 +38,8 @@ export interface ToolDefinition {
     | "letter"
     | "lorem"
     | "cloud"
-    | "compare";
+    | "compare"
+    | "sort";
 }
 
 export interface PublishedTool extends ToolDefinition {

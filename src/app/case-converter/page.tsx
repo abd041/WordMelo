@@ -293,7 +293,8 @@ export default function CaseConverterPage() {
               gather prompts with the{" "}
               <Link href="/random-word-generator">Random Word Generator</Link>.
               To see what changed between two versions, use{" "}
-              <Link href="/text-compare">Text Compare</Link>.
+              <Link href="/text-compare">Text Compare</Link>. To put a list in
+              A–Z order, use the <Link href="/alphabetizer">Alphabetizer</Link>.
             </p>
           </div>
         </section>
