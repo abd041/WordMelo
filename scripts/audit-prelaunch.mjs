@@ -113,8 +113,8 @@ async function main() {
   console.log(`\nWordMelo pre-launch audit → ${baseUrl}\n`);
 
   const published = await loadRegistrySlugs();
-  if (published.length !== 13) {
-    fail(`Expected 13 published tools in registry, found ${published.length}`);
+  if (published.length !== 14) {
+    fail(`Expected 14 published tools in registry, found ${published.length}`);
   } else {
     pass(`Registry has ${published.length} published tools`);
   }

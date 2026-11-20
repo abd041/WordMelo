@@ -46,7 +46,7 @@ describe("word cloud page metadata", () => {
       .filter((url) => url.includes("word-cloud-generator"));
     expect(urls).toEqual(["https://wordmelo.com/word-cloud-generator"]);
     const tools = getPublishedTools();
-    expect(tools).toHaveLength(13);
+    expect(tools).toHaveLength(14);
     expect(tools.filter((tool) => tool.href === WORD_CLOUD_PATH)).toHaveLength(1);
   });
 

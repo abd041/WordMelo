@@ -6,11 +6,11 @@ import {
 } from "./registry";
 
 describe("published tool registry", () => {
-  it("publishes thirteen distinct routes", () => {
+  it("publishes fourteen distinct routes", () => {
     const tools = getPublishedTools();
     const hrefs = tools.map((tool) => tool.href);
-    expect(tools).toHaveLength(13);
-    expect(new Set(hrefs).size).toBe(13);
+    expect(tools).toHaveLength(14);
+    expect(new Set(hrefs).size).toBe(14);
     expect(hrefs.every((href) => href.startsWith("/"))).toBe(true);
   });
 
@@ -22,7 +22,10 @@ describe("published tool registry", () => {
   });
 
   it("search matches names and ignores empty queries", () => {
-    expect(searchPublishedTools("   ")).toHaveLength(13);
+    expect(searchPublishedTools("   ")).toHaveLength(14);
+    expect(
+      searchPublishedTools("typing speed").some((tool) => tool.id === "typing-speed-test"),
+    ).toBe(true);
     expect(
       searchPublishedTools("alphabetizer").some((tool) => tool.id === "alphabetizer"),
     ).toBe(true);

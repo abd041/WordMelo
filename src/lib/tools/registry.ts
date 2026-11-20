@@ -354,6 +354,29 @@ export const tools: ToolDefinition[] = [
     href: "/alphabetizer",
     icon: "sort",
   },
+  {
+    id: "typing-speed-test",
+    name: "Typing Speed Test",
+    slug: "typing-speed-test",
+    status: "published",
+    categoryId: "counting",
+    summary: "Check your WPM and typing accuracy with timed word and sentence tests.",
+    description:
+      "Take a free typing speed test in your browser. Measure net and gross WPM, keystroke accuracy, and mistakes on 15 to 120-second tests — no signup.",
+    keywords: [
+      "typing speed test",
+      "wpm test",
+      "words per minute test",
+      "typing test online",
+      "free typing test",
+      "typing accuracy test",
+      "1 minute typing test",
+      "keyboard typing speed test",
+      "check typing speed",
+    ],
+    href: "/typing-speed-test",
+    icon: "keyboard",
+  },
 ];
 
 export function getPublishedTools(): PublishedTool[] {

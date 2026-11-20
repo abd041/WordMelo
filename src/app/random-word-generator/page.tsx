@@ -318,6 +318,8 @@ export default function RandomWordGeneratorPage() {
             </p>
             <p>
               After brainstorming, continue with the{" "}
+              <Link href="/typing-speed-test">Typing Speed Test</Link> to
+              practice those words against the clock, the{" "}
               <Link href="/alphabetizer">Alphabetizer</Link> to sort the words, the{" "}
               <Link href="/word-counter">Word Counter</Link>,{" "}
               <Link href="/case-converter">Case Converter</Link>,{" "}
@@ -337,6 +339,7 @@ export default function RandomWordGeneratorPage() {
           preferredIds={[
             "random-letter-generator",
             "pictionary-word-generator",
+            "typing-speed-test",
             "word-counter",
             "character-counter",
           ]}

@@ -5,6 +5,7 @@ import {
   Cloud,
   ArrowUpAZ,
   GitCompare,
+  Keyboard,
   Binary,
   Hash,
   Italic,
@@ -31,6 +32,7 @@ const icons = {
   cloud: Cloud,
   compare: GitCompare,
   sort: ArrowUpAZ,
+  keyboard: Keyboard,
 } as const;
 
 interface ToolCardProps {
@@ -110,7 +112,9 @@ export function ToolCard({ tool, className, featured = false }: ToolCardProps) {
                                   ? "Open Text Compare Tool"
                                   : tool.id === "alphabetizer"
                                     ? "Open Alphabetizer"
-                                    : "Open tool"}
+                                    : tool.id === "typing-speed-test"
+                                      ? "Open Typing Speed Test"
+                                      : "Open tool"}
           <span aria-hidden="true" className="ml-1">
             →
           </span>

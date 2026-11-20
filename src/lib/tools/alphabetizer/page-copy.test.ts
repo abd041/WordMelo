@@ -46,7 +46,7 @@ describe("alphabetizer page metadata", () => {
       .filter((url) => url.includes("alphabetizer"));
     expect(urls).toEqual(["https://wordmelo.com/alphabetizer"]);
     const tools = getPublishedTools();
-    expect(tools).toHaveLength(13);
+    expect(tools).toHaveLength(14);
     expect(tools.filter((tool) => tool.href === ALPHABETIZER_PATH)).toHaveLength(1);
   });
 

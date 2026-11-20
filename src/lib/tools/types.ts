@@ -39,7 +39,8 @@ export interface ToolDefinition {
     | "lorem"
     | "cloud"
     | "compare"
-    | "sort";
+    | "sort"
+    | "keyboard";
 }
 
 export interface PublishedTool extends ToolDefinition {

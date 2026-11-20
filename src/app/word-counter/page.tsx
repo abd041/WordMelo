@@ -197,7 +197,10 @@ export default function WordCounterPage() {
               familiarity. WordMelo uses approximately{" "}
               {siteConfig.readingWordsPerMinute} words per minute as a practical
               average for general English prose. Dense academic writing often
-              takes longer; light narrative may take less.
+              takes longer; light narrative may take less. Reading WPM is not
+              a typing score; use the{" "}
+              <Link href="/typing-speed-test">Typing Speed Test</Link> to
+              measure keyboard words per minute.
             </p>
 
             <h2>Speaking time explained</h2>
@@ -279,7 +282,10 @@ export default function WordCounterPage() {
 
         <ToolFAQ items={faqItems} />
 
-        <RelatedTools currentToolId="word-counter" />
+        <RelatedTools
+          currentToolId="word-counter"
+          preferredIds={["typing-speed-test", "character-counter"]}
+        />
       </ToolShell>
     </>
   );

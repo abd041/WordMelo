@@ -346,7 +346,9 @@ export default function CharacterCounterPage() {
               frequency and reading-time estimates, open the{" "}
               <Link href="/word-counter">Word Counter</Link>. To highlight
               edits between two pastes, use{" "}
-              <Link href="/text-compare">Text Compare</Link>.
+              <Link href="/text-compare">Text Compare</Link>. To measure keyboard
+              speed rather than pasted length, use the{" "}
+              <Link href="/typing-speed-test">Typing Speed Test</Link>.
             </p>
             <ul className="mt-3 text-sm text-ink-muted">
               {CHARACTER_COUNTER_RULES_SUMMARY.map((rule) => (
@@ -362,6 +364,7 @@ export default function CharacterCounterPage() {
           currentToolId="character-counter"
           preferredIds={[
             "word-counter",
+            "typing-speed-test",
             "case-converter",
             "title-case-converter",
             "lorem-ipsum-generator",

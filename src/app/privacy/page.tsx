@@ -33,7 +33,8 @@ export default function PrivacyPage() {
           <p>
             WordMelo’s tools run in your browser. Text you type or paste into a
             tool is processed on your device to generate counts, conversions,
-            styles, comparisons, sorted lists, word clouds, random samples, or placeholder content. That tool content is
+            styles, comparisons, sorted lists, word clouds, random samples, typing
+            scores, or placeholder content. That tool content is
             not transmitted to WordMelo servers for processing, logging,
             analytics, or third-party analysis.
           </p>
@@ -57,6 +58,10 @@ export default function PrivacyPage() {
             <li>
               An optional Word Counter draft, saved only after you turn autosave
               on, and deleted when you turn it off
+            </li>
+            <li>
+              Optional typing-speed scores (WPM, accuracy, duration, mode, and
+              date — not the passage you typed)
             </li>
           </ul>
           <p>
