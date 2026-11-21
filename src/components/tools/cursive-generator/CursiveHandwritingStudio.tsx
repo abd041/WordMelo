@@ -246,7 +246,7 @@ export function CursiveHandwritingStudio({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       <section
         aria-labelledby="handwriting-input-heading"
         className="overflow-hidden rounded-[1.15rem] border border-line bg-surface shadow-soft"
@@ -260,8 +260,9 @@ export function CursiveHandwritingStudio({
               Handwriting Studio
             </h2>
             <p className="text-xs text-ink-soft">
-              Preview uses the same OFL font files as PNG export. Checkerboard
-              means transparent — it is not baked into the file.
+              This is a handwriting picture, not copy-and-paste Unicode. The preview
+              uses the same OFL font as the PNG. A checkerboard means transparent
+              and is not saved in the file.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -317,7 +318,7 @@ export function CursiveHandwritingStudio({
               title={preset.description}
               onClick={() => applyPreset(preset.id)}
               className={cn(
-                "rounded-control border px-3 py-1.5 text-xs font-semibold transition-colors sm:text-sm",
+                "min-h-11 rounded-control border px-3 py-1.5 text-xs font-semibold transition-colors sm:text-sm",
                 activePreset === preset.id
                   ? "border-accent bg-accent text-accent-foreground"
                   : "border-line bg-paper text-ink hover:bg-mint/50",
@@ -329,7 +330,7 @@ export function CursiveHandwritingStudio({
         </div>
       </section>
 
-      <section aria-labelledby="font-picker-heading" className="space-y-2">
+      <section aria-labelledby="font-picker-heading" className="min-w-0 space-y-2">
         <h3
           id="font-picker-heading"
           className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-soft"
@@ -339,7 +340,7 @@ export function CursiveHandwritingStudio({
         <div
           role="listbox"
           aria-label="Handwriting font"
-          className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         >
           {CURSIVE_FONTS.map((font) => {
             const selected = font.id === fontId;
@@ -367,7 +368,7 @@ export function CursiveHandwritingStudio({
                     });
                 }}
                 className={cn(
-                  "rounded-[1rem] border px-3 py-3 text-left transition-colors",
+                  "min-w-0 w-full rounded-[1rem] border px-3 py-3 text-left transition-colors",
                   selected
                     ? "border-accent bg-accent-soft shadow-soft"
                     : "border-line bg-paper hover:border-line-strong hover:bg-mint/40",
@@ -395,7 +396,7 @@ export function CursiveHandwritingStudio({
                 >
                   {previewSnippet(text)}
                 </span>
-                <span className="mt-1 block text-[0.7rem] text-ink-soft">
+                <span className="mt-1 block break-words text-[0.7rem] leading-snug text-ink-soft">
                   {font.description}
                 </span>
               </button>
@@ -537,7 +538,7 @@ export function CursiveHandwritingStudio({
                     setColor(swatch.value);
                   }}
                   className={cn(
-                    "h-8 w-8 rounded-full border-2",
+                    "h-11 w-11 rounded-full border-2",
                     color === swatch.value ? "border-accent" : "border-line",
                   )}
                   style={{ backgroundColor: swatch.value }}
@@ -553,7 +554,7 @@ export function CursiveHandwritingStudio({
                     setActivePreset(null);
                     setColor(event.target.value);
                   }}
-                  className="h-8 w-10 cursor-pointer rounded border border-line bg-paper"
+                  className="h-11 w-11 cursor-pointer rounded border border-line bg-paper"
                 />
               </label>
             </div>

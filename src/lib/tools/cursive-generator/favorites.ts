@@ -59,3 +59,12 @@ export function pushRecentCopiedStyleId(
   );
   return next;
 }
+
+/** Live preview maps to Mathematical Script. Alphabet copies are not styles. */
+export function rememberedStyleId(
+  actionId: string,
+  styleIds: readonly string[],
+): string | null {
+  const id = actionId === "live-script" ? "script" : actionId;
+  return styleIds.includes(id) ? id : null;
+}

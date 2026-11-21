@@ -6,6 +6,16 @@ import { ToolFAQ } from "@/components/tools/ToolFAQ";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import { ToolShell } from "@/components/tools/ToolShell";
 import { absoluteUrl, createPageMetadata } from "@/lib/seo";
+import { cursiveAlphabetLine } from "@/lib/tools/cursive-generator/alphabet";
+import {
+  CURSIVE_DESCRIPTION,
+  CURSIVE_FAQS,
+  CURSIVE_H1,
+  CURSIVE_KEYWORDS,
+  CURSIVE_PATH,
+  CURSIVE_SUBTITLE,
+  CURSIVE_TITLE,
+} from "@/lib/tools/cursive-generator/page-copy";
 import {
   CURSIVE_FONTS,
   CURSIVE_SAMPLE_NAME,
@@ -15,78 +25,11 @@ import {
 } from "@/lib/tools/cursive-generator";
 
 export const metadata = createPageMetadata({
-  title: "Cursive Generator — Copy & Paste Text & Fonts | WordMelo",
-  description:
-    "Create cursive text and handwriting online. Copy stylish Unicode fonts, design names with real script typefaces, and download cursive lettering as PNG.",
-  path: "/cursive-generator",
-  keywords: [
-    "cursive generator",
-    "cursive font generator",
-    "cursive text generator",
-    "cursive maker",
-    "cursive writing generator",
-    "cursive name generator",
-    "cursive fonts copy and paste",
-    "cursive font generator copy and paste",
-    "fancy cursive font generator",
-    "cursive handwriting generator",
-    "convert text to cursive",
-    "names in cursive",
-  ],
+  title: CURSIVE_TITLE,
+  description: CURSIVE_DESCRIPTION,
+  path: CURSIVE_PATH,
+  keywords: [...CURSIVE_KEYWORDS],
 });
-
-const faqItems = [
-  {
-    question: "How do I convert text to cursive?",
-    answer:
-      "Open Copy & Paste Cursive, type your words, then copy Mathematical Script or Bold Mathematical Script. For an image, switch to Handwriting Studio and download PNG.",
-  },
-  {
-    question: "Can I copy and paste cursive fonts?",
-    answer:
-      "Yes for Unicode mathematical script styles. They paste as special characters. Handwriting fonts export as PNG images, not system font installers.",
-  },
-  {
-    question: "How do I write my name in cursive?",
-    answer:
-      "Select Name Mode, enter a name, copy a Unicode design, or open Handwriting Studio to customize a font and download a PNG.",
-  },
-  {
-    question: "Is the Cursive Generator free?",
-    answer:
-      "Yes. It is free to use in your browser with no account required.",
-  },
-  {
-    question: "Can I download cursive handwriting?",
-    answer:
-      "Yes. Handwriting Studio exports WordMelo-cursive-writing.png with your font, size, color, alignment, and background — including real transparency.",
-  },
-  {
-    question: "What is the difference between cursive text and handwriting fonts?",
-    answer:
-      "Unicode cursive is copyable text made of mathematical script characters. Handwriting fonts are real OFL typefaces rendered for preview and PNG export.",
-  },
-  {
-    question: "Why do some cursive characters look different?",
-    answer:
-      "Apps choose their own fonts for Unicode script code points. Missing glyphs may look plain. PNG handwriting stays consistent because letterforms are in the image.",
-  },
-  {
-    question: "Does cursive work on Instagram or TikTok?",
-    answer:
-      "Unicode script often works in bios and captions, but support varies. Where special characters fail, upload a handwriting PNG instead. Compatibility is not guaranteed.",
-  },
-  {
-    question: "Can I change font size and color?",
-    answer:
-      "Yes in Handwriting Studio — plus background, alignment, spacing, layout presets, and standard or high-resolution PNG export.",
-  },
-  {
-    question: "Is my text uploaded to a server?",
-    answer:
-      "No. Conversion, font rendering, and PNG export run locally in your browser.",
-  },
-];
 
 function example(styleId: string, text = CURSIVE_SAMPLE_TEXT): string {
   return getCursiveUnicodeStyle(styleId)?.transform(text) ?? text;
@@ -120,6 +63,7 @@ export default function CursiveGeneratorPage() {
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any",
     browserRequirements: "Requires a modern browser with JavaScript enabled.",
+    isAccessibleForFree: true,
     offers: {
       "@type": "Offer",
       price: "0",
@@ -147,8 +91,8 @@ export default function CursiveGeneratorPage() {
         className="pt-6 sm:pt-8"
       >
         <ToolHeader
-          title="Cursive Generator — Create Cursive Text & Handwriting"
-          description="Turn words and names into beautiful cursive. Copy Unicode script text, preview real handwriting fonts, or download personalized lettering as a PNG."
+          title={CURSIVE_H1}
+          description={CURSIVE_SUBTITLE}
           privacyNote="Runs locally in your browser — text is not uploaded."
         />
 
@@ -168,20 +112,20 @@ export default function CursiveGeneratorPage() {
               What is a Cursive Generator?
             </h2>
             <p className="mt-3 text-base leading-relaxed text-ink-muted">
-              A cursive generator turns plain words into script-style lettering.
-              WordMelo offers two complementary workflows: copyable Unicode
-              mathematical script, and a Handwriting Studio that renders real OFL
-              cursive fonts for PNG download.
+              A cursive generator turns ordinary letters into script. On this page
+              you can copy Unicode cursive for a word or a name, copy individual
+              alphabet letters, or switch to Handwriting Studio when you want a
+              PNG made with a real script font.
             </p>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
             <article className="rounded-[1.15rem] border border-line bg-surface px-5 py-5 sm:px-6">
               <h2 className="font-display text-xl font-semibold text-ink">
-                How to convert text into cursive
+                How to copy and paste cursive
               </h2>
               <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-muted">
-                <li>Open Copy & Paste Cursive.</li>
+                <li>Stay on Copy &amp; Paste Cursive and choose Words or Names.</li>
                 <li>
                   Type one word or a phrase, such as{" "}
                   <code className="rounded bg-mint px-1.5 py-0.5 text-ink">
@@ -264,14 +208,14 @@ export default function CursiveGeneratorPage() {
           <div className="grid gap-4 lg:grid-cols-2">
             <article className="rounded-[1.15rem] border border-line bg-surface px-5 py-5 sm:px-6">
               <h2 className="font-display text-xl font-semibold text-ink">
-                Create your name in cursive
+                Cursive names
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-                Use Name Mode for short personalizations. Example for{" "}
+                Choose Names, type a name, or use an example such as Sofia or{" "}
                 <code className="rounded bg-mint px-1.5 py-0.5 text-ink">
                   {CURSIVE_SAMPLE_NAME}
                 </code>
-                :
+                . The live preview for that name is:
               </p>
               <p className="mt-3 font-serif text-2xl text-ink">
                 {example("script", CURSIVE_SAMPLE_NAME)}
@@ -286,6 +230,12 @@ export default function CursiveGeneratorPage() {
               <h2 className="font-display text-xl font-semibold text-ink">
                 Unicode cursive vs handwriting fonts
               </h2>
+              <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+                Copy-and-paste cursive is text. Handwriting is an image. Use the
+                first when you need to paste a word, name, or alphabet letter.
+                Use the second when the letter shapes themselves have to stay
+                the same.
+              </p>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-muted">
                 <li>
                   <strong className="text-ink">Unicode</strong> — editable text
@@ -302,7 +252,24 @@ export default function CursiveGeneratorPage() {
 
           <article className="rounded-[1.15rem] border border-line bg-surface px-5 py-5 sm:px-7 sm:py-6">
             <h2 className="font-display text-xl font-semibold text-ink sm:text-2xl">
-              Compare handwriting fonts
+              Cursive alphabet
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+              Mathematical Script has a Unicode stand-in for every English
+              letter. Copy one letter from the alphabet above the style cards,
+              or use the full lines below.
+            </p>
+            <p className="mt-3 break-words font-serif text-lg leading-relaxed text-ink">
+              {cursiveAlphabetLine("script", "upper")}
+            </p>
+            <p className="mt-2 break-words font-serif text-lg leading-relaxed text-ink">
+              {cursiveAlphabetLine("script", "lower")}
+            </p>
+          </article>
+
+          <article className="rounded-[1.15rem] border border-line bg-surface px-5 py-5 sm:px-7 sm:py-6">
+            <h2 className="font-display text-xl font-semibold text-ink sm:text-2xl">
+              Handwriting fonts
             </h2>
             <p className="mt-2 text-sm text-ink-muted">
               All seven fonts are OFL-licensed, self-hosted Latin WOFF2 subsets.
@@ -383,7 +350,7 @@ export default function CursiveGeneratorPage() {
               </li>
             </ul>
             <p className="mt-4 text-sm text-ink-muted">
-              For broader Unicode styling, try the{" "}
+              For bold, gothic, and other Unicode styles beyond cursive, use the{" "}
               <Link href="/fancy-text-generator">Fancy Text Generator</Link>.
               Normalize casing with the{" "}
               <Link href="/case-converter">Case Converter</Link>, check length
@@ -394,9 +361,12 @@ export default function CursiveGeneratorPage() {
           </article>
         </section>
 
-        <ToolFAQ title="Frequently asked questions" items={faqItems} />
+        <ToolFAQ title="Frequently asked questions" items={[...CURSIVE_FAQS]} />
 
-        <RelatedTools currentToolId="cursive-generator" />
+        <RelatedTools
+          currentToolId="cursive-generator"
+          preferredIds={["fancy-text-generator", "case-converter", "word-counter"]}
+        />
       </ToolShell>
     </>
   );

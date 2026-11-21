@@ -2,15 +2,20 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Check, Copy, Heart, PenLine } from "lucide-react";
+import { CursiveAlphabet } from "@/components/tools/cursive-generator/CursiveAlphabet";
 import { Button } from "@/components/ui/Button";
 import { FeedbackMessage } from "@/components/ui/FeedbackMessage";
 import {
+  CURSIVE_NAME_EXAMPLES,
   CURSIVE_SAMPLE_NAME,
   CURSIVE_SAMPLE_TEXT,
   CURSIVE_STYLE_GROUPS,
   CURSIVE_UNICODE_STYLES,
+  CURSIVE_WORD_EXAMPLES,
   generateAllCursiveStyles,
+  getCursiveUnicodeStyle,
   pushRecentCopiedStyleId,
+  rememberedStyleId,
   readFavoriteStyleIds,
   readRecentCopiedStyleIds,
   toggleFavoriteStyleId,
@@ -50,7 +55,7 @@ function StyleCard({
   onHandwriting: () => void;
 }) {
   return (
-    <li className="flex flex-col rounded-[1.05rem] border border-line bg-paper/80 p-4 sm:p-5">
+    <li className="flex min-w-0 flex-col rounded-[1.05rem] border border-line bg-paper/80 p-4 sm:p-5">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-ink-soft">
@@ -95,11 +100,12 @@ function StyleCard({
         </p>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Button
           type="button"
-          size="sm"
+          size="md"
           variant="primary"
+          className="w-full min-w-0 whitespace-normal sm:w-auto"
           onClick={onCopy}
           aria-label={`Copy ${style.name}`}
         >
@@ -112,8 +118,9 @@ function StyleCard({
         </Button>
         <Button
           type="button"
-          size="sm"
+          size="md"
           variant="secondary"
+          className="w-full min-w-0 whitespace-normal sm:w-auto"
           onClick={onHandwriting}
         >
           <PenLine className="h-4 w-4" aria-hidden />
@@ -184,9 +191,15 @@ export function CursiveUnicodePanel({
       return;
     }
     setCopiedId(id);
-    const nextRecent = pushRecentCopiedStyleId(recent, id);
-    setRecent(nextRecent);
-    writeRecentCopiedStyleIds(nextRecent);
+    const styleId = rememberedStyleId(
+      id,
+      CURSIVE_UNICODE_STYLES.map((style) => style.id),
+    );
+    if (styleId) {
+      const nextRecent = pushRecentCopiedStyleId(recent, styleId);
+      setRecent(nextRecent);
+      writeRecentCopiedStyleIds(nextRecent);
+    }
     setFeedback({ message: `Copied ${name}`, tone: "success" });
     window.setTimeout(() => {
       setCopiedId((current) => (current === id ? null : current));
@@ -214,7 +227,7 @@ export function CursiveUnicodePanel({
     rows: typeof visible,
   ) {
     return (
-      <ul className="grid gap-3 lg:grid-cols-2">
+      <ul className="grid min-w-0 gap-3 lg:grid-cols-2">
         {rows.map((row) => {
           const meta = CURSIVE_UNICODE_STYLES.find((s) => s.id === row.id)!;
           return (
@@ -235,7 +248,7 @@ export function CursiveUnicodePanel({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       <div
         role="group"
         aria-label="Phrase or name focus"
@@ -243,8 +256,8 @@ export function CursiveUnicodePanel({
       >
         {(
           [
-            ["phrase", "Phrase", "Full lines and captions"],
-            ["name", "Name Mode", "Short personalizations"],
+            ["phrase", "Words", "Cursive words and short phrases"],
+            ["name", "Names", "Cursive name generator"],
           ] as const
         ).map(([id, label, blurb]) => {
           const active =
@@ -271,14 +284,54 @@ export function CursiveUnicodePanel({
         })}
       </div>
 
+      <div className="space-y-2">
+        <div role="group" aria-label="Word examples">
+        <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Try a word</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {CURSIVE_WORD_EXAMPLES.map((example) => (
+            <button
+              key={example}
+              type="button"
+              className="min-h-11 rounded-control border border-line bg-paper px-3 text-sm font-semibold text-ink hover:border-accent hover:bg-accent-soft"
+              onClick={() => {
+                if (nameMode) onNameModeChange(false);
+                onTextChange(example);
+              }}
+            >
+              {example}
+            </button>
+          ))}
+        </div>
+        </div>
+        <div role="group" aria-label="Name examples" className="pt-1">
+        <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Try a name</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {CURSIVE_NAME_EXAMPLES.map((example) => (
+            <button
+              key={example}
+              type="button"
+              className="min-h-11 rounded-control border border-line bg-paper px-3 text-sm font-semibold text-ink hover:border-accent hover:bg-accent-soft"
+              onClick={() => {
+                if (!nameMode) onNameModeChange(true);
+                onTextChange(example);
+              }}
+            >
+              {example}
+            </button>
+          ))}
+        </div>
+        </div>
+      </div>
+
       {nameMode ? (
         <p className="rounded-control border border-accent/25 bg-accent-soft/60 px-3 py-2 text-sm text-ink">
-          Name Mode is for a short name. Mathematical Script and Bold
-          Mathematical Script are the letters you can copy and paste. Name
-          Designs add a flourish. Handwriting Studio downloads the same name
-          as a PNG.
+          Names copies Unicode script you can paste. Flourished cards add decoration around the same letters. Handwriting Studio turns this name into a PNG instead.
         </p>
-      ) : null}
+      ) : (
+        <p className="rounded-control border border-line bg-paper px-3 py-2 text-sm text-ink-muted">
+          Words copies Unicode script. It is not a handwriting font. Use Handwriting Studio when you need an image.
+        </p>
+      )}
 
       <section
         aria-labelledby="cursive-unicode-input"
@@ -342,8 +395,28 @@ export function CursiveUnicodePanel({
             <span>{charCount.toLocaleString()} characters</span>
             <span>Processed locally — not uploaded</span>
           </div>
+          <LivePreview
+            text={text}
+            nameMode={nameMode}
+            copied={copiedId === "live-script"}
+            onCopy={() => {
+              const output = getCursiveUnicodeStyle("script")?.transform(text) ?? "";
+              void handleCopy("live-script", output, nameMode ? "your name in cursive" : "your cursive text");
+            }}
+          />
         </div>
       </section>
+
+      <CursiveAlphabet
+        copiedId={copiedId}
+        onCopy={(value, label) => {
+          void handleCopy(`alphabet-${label}`, value, label);
+        }}
+      />
+
+      {feedback ? (
+        <FeedbackMessage tone={feedback.tone} message={feedback.message} />
+      ) : null}
 
       <div
         role="toolbar"
@@ -357,7 +430,7 @@ export function CursiveUnicodePanel({
             aria-pressed={filter === item.id}
             onClick={() => setFilter(item.id)}
             className={cn(
-              "rounded-control border px-3 py-1.5 text-sm font-medium transition-colors",
+              "min-h-11 rounded-control border px-3 py-1.5 text-sm font-medium transition-colors",
               filter === item.id
                 ? "border-accent bg-accent text-accent-foreground"
                 : "border-line bg-paper text-ink hover:bg-mint/50",
@@ -370,10 +443,6 @@ export function CursiveUnicodePanel({
           </button>
         ))}
       </div>
-
-      {feedback ? (
-        <FeedbackMessage tone={feedback.tone} message={feedback.message} />
-      ) : null}
 
       {!text.trim() ? (
         <p className="rounded-control border border-dashed border-line bg-paper px-4 py-8 text-center text-sm text-ink-muted">
@@ -421,6 +490,41 @@ export function CursiveUnicodePanel({
       ) : (
         renderCards(visible)
       )}
+    </div>
+  );
+}
+
+function LivePreview({
+  text,
+  nameMode,
+  copied,
+  onCopy,
+}: {
+  text: string;
+  nameMode: boolean;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  const output = text.trim()
+    ? (getCursiveUnicodeStyle("script")?.transform(text) ?? text)
+    : "";
+  return (
+    <div className="mt-4 rounded-control border border-accent/30 bg-accent-soft/40 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-ink">
+          {nameMode ? "Name in cursive" : "Live cursive preview"}
+        </p>
+        <Button type="button" className="min-h-11" disabled={!output} onClick={onCopy}>
+          {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
+          {copied ? "Copied" : "Copy cursive"}
+        </Button>
+      </div>
+      <p className="mt-3 break-words font-serif text-3xl leading-tight text-ink sm:text-4xl" lang="en">
+        {output || "Your cursive preview appears here."}
+      </p>
+      <p className="mt-2 text-xs text-ink-muted">
+        Mathematical Script. Paste it as text. Open Handwriting Studio when you need a PNG.
+      </p>
     </div>
   );
 }
